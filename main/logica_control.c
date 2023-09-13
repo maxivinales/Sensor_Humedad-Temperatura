@@ -3,6 +3,7 @@
 #include "Leq_task.c"
 #include "audio_task.c"
 #include "WiFi_manager.c"
+#include "esp_system.h"
 #include "esp_wifi.h"
 #include "freertos/projdefs.h"
 #include "ota.c"
@@ -47,17 +48,21 @@ void control_task(void *parameter){
             vTaskDelay(pdMS_TO_TICKS(30000));
         }
     }else{
-        mode_WiFi_manager.value = 0;
+        // mode_WiFi_manager.value = 0;
         wifi_init_sta(data_WiFi_SC);
         // vTaskDelay(pdMS_TO_TICKS(5000));
         // init_OTA();
-        saveConfig();
+        // saveConfig();
         // update_firmware(CHIPID.value_str);
         uint8_t cont_timeout = 0;
         while(wifi_connection_status.value == 0){
             vTaskDelay(pdMS_TO_TICKS(100));
             cont_timeout++;
             if(cont_timeout >= 100){
+                mode_WiFi_manager.value = 0;
+                saveConfig();
+                vTaskDelay(pdMS_TO_TICKS(1000));
+                esp_restart();
                 continue;
             }
         }

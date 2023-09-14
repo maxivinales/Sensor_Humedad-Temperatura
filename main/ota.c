@@ -223,7 +223,7 @@ ota_end:
     return(err);
 }
 
-esp_err_t get_firmware_version(void){
+esp_err_t get_firmware_version(char* _chipid){
     // esp_http_client_config_t config = {
     //     .url = "http://fabrica.faniot.ar:1880/ota/firmwareversion?chip_id=C44F33605219",
     // };
@@ -266,12 +266,16 @@ esp_err_t get_firmware_version(void){
         ESP_LOGW("HTTP_CLIENT", "timer_timeout_wifi_connection = %u", timer_timeout_wifi_connection);
     }
 
+    char url_ota[OTA_URL_SIZE]; // genero la url
+    snprintf(url_ota, OTA_URL_SIZE, "%s/ota/firmwareversion?chip_id=%s", OTA_URL_FANIOT, _chipid);
+    ESP_LOGI(TAG_ota, "URL OTA -> %s\n", url_ota);
+
     if(wifi_connection_status.value == 0 ){
         ESP_LOGE("HTTP_CLIENT", "No conectado a WiFi, no se puede obtener ultima version de firmware");
         return(ESP_FAIL);
     }else{
         timer_timeout_wifi_connection = 0;
-        rest_get();
+        rest_get(url_ota);
         while(new_firmware_version.value == 0 && timer_timeout_wifi_connection >= 100){
             vTaskDelay(1);
             timer_timeout_wifi_connection++;
@@ -306,7 +310,7 @@ void process_json_response(const char *json_str) {
         cJSON_Delete(root);
         root = NULL;
     }
-    
+
     if(value != NULL){
         cJSON_Delete(value);
         value = NULL;

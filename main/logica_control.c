@@ -63,12 +63,11 @@ void control_task(void *parameter){
                 saveConfig();
                 vTaskDelay(pdMS_TO_TICKS(1000));
                 esp_restart();
-                continue;
             }
         }
         
         if(wifi_connection_status.value == 1){
-            get_firmware_version();
+            get_firmware_version(CHIPID.value_str);
             mqtt_launch();
             
         }

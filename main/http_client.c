@@ -132,12 +132,12 @@ esp_err_t client_event_get_handler(esp_http_client_event_handle_t evt)
             }
 
             if(firmware_version != NULL){
-                cJSON_Delete(Jsonsito);
+                cJSON_Delete(firmware_version);
                 Jsonsito = NULL;
             }
 
             if(datetime != NULL){
-                cJSON_Delete(Jsonsito);
+                cJSON_Delete(datetime);
                 Jsonsito = NULL;
             }
         }
@@ -148,10 +148,10 @@ esp_err_t client_event_get_handler(esp_http_client_event_handle_t evt)
     return ESP_OK;
 }
 
-static void rest_get()
+static void rest_get(char* _url)
 {
     esp_http_client_config_t config_get = {
-        .url = "http://fabrica.faniot.ar:1880/ota/firmwareversion?chip_id=C44F33605219",//"http://worldclockapi.com/api/json/utc/now",
+        .url = _url,//"http://fabrica.faniot.ar:1880/ota/firmwareversion?chip_id=C44F33605219",//"http://worldclockapi.com/api/json/utc/now",
         .method = HTTP_METHOD_GET,
         .cert_pem = NULL,
         // .buffer_size = 1024,

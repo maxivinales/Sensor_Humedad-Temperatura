@@ -23,12 +23,12 @@ esp_err_t client_event_get_handler(esp_http_client_event_handle_t evt)
     case HTTP_EVENT_ON_DATA:
         printf("HTTP_EVENT_ON_DATA: %d, %s\n", evt->data_len, (char *)evt->data);
         if (evt->data_len > 0) {
-            ESP_LOGW("debug Cukla http_client", "linea 25");
+            // ESP_LOGW("debug Cukla http_client", "linea 25");
             if (http_receiving == false) {
                 http_receiving = true;
-                ESP_LOGW("debug Cukla http_client", "linea 28");
+                // ESP_LOGW("debug Cukla http_client", "linea 28");
                 cursor = evt->data_len;
-                ESP_LOGW("debug Cukla http_client", "linea 30");
+                // ESP_LOGW("debug Cukla http_client", "linea 30");
 
                 char *aux_s1, *aux_s2;
                 aux_s1 = (char *)evt->data;
@@ -36,13 +36,13 @@ esp_err_t client_event_get_handler(esp_http_client_event_handle_t evt)
                 for(int i = 0; i < evt->data_len; i++){
                     *(aux_s2 + i) = *(aux_s1 + i);
                 }
-                ESP_LOGW("debug Cukla http_client", "%s",aux_s2);
+                // ESP_LOGW("debug Cukla http_client", "%s",aux_s2);
                 
                 // strcpy(&recv_http[0], (char *)evt->data);
                 // strcpy_s(&recv_http[0], evt->data_len, (char *)evt->data);
                 // strncpy(&recv_http[0], (char *)evt->data, evt->data_len);
                 // snprintf(&recv_http[0], evt->data_len, "%s", (char *)evt->data);
-                ESP_LOGW("debug Cukla http_client", "linea 34");
+                // ESP_LOGW("debug Cukla http_client", "linea 34");
 
                 // recv_http = malloc((evt->data_len + 1) * sizeof(char));
                 // if (recv_http == NULL) {
@@ -53,7 +53,7 @@ esp_err_t client_event_get_handler(esp_http_client_event_handle_t evt)
                 // ESP_LOGW(TAG_http_client, "recv_http -> %s", recv_http);
                 // strcpy(recv_http, (char *)evt->data);
             } else {
-                ESP_LOGW("debug Cukla http_client", "linea 45");
+                // ESP_LOGW("debug Cukla http_client", "linea 45");
                 // strcpy(&recv_http[cursor], (char *)evt->data);
                 char *aux_s1, *aux_s2;
                 aux_s1 = (char *)evt->data;
@@ -61,13 +61,13 @@ esp_err_t client_event_get_handler(esp_http_client_event_handle_t evt)
                 for(int i = 0; i < evt->data_len; i++){
                     *(aux_s2 + i) = *(aux_s1 + i);
                 }
-                ESP_LOGW("debug Cukla http_client", "%s",aux_s2);
+                // ESP_LOGW("debug Cukla http_client", "%s",aux_s2);
                 // strcpy_s(&recv_http[0], evt->data_len, (char *)evt->data);
                 // strncpy(&recv_http[cursor], (char *)evt->data, evt->data_len);
                 // snprintf(&recv_http[cursor], evt->data_len, "%s", (char *)evt->data);
-                ESP_LOGW("debug Cukla http_client", "linea 49");
+                // ESP_LOGW("debug Cukla http_client", "linea 49");
                 cursor += evt->data_len;
-                ESP_LOGW("debug Cukla http_client", "linea 51");
+                // ESP_LOGW("debug Cukla http_client", "linea 51");
                 // char *aux_S1;
                 // size_t len_string = strlen(recv_http) + 1 + evt->data_len + 1;
                 // aux_S1 = malloc(len_string);
@@ -87,9 +87,9 @@ esp_err_t client_event_get_handler(esp_http_client_event_handle_t evt)
         printf("HTTP_EVENT_ON_FINISH: %s\n", _recv_http);
         if (http_receiving == true) {
             http_receiving = false;
-            ESP_LOGW("debug Cukla http_client", "linea 67");
+            // ESP_LOGW("debug Cukla http_client", "linea 67");
             cJSON *Jsonsito = cJSON_Parse(_recv_http);
-            ESP_LOGW("debug Cukla http_client", "linea 69");
+            // ESP_LOGW("debug Cukla http_client", "linea 69");
             if (Jsonsito == NULL) {
                 ESP_LOGW(TAG_http_client, "Error al analizar el JSON\n");
                 const char *error_ptr = cJSON_GetErrorPtr();
@@ -100,7 +100,7 @@ esp_err_t client_event_get_handler(esp_http_client_event_handle_t evt)
                 // recv_http = NULL;
                 return ESP_FAIL;
             }
-            ESP_LOGW("debug Cukla http_client", "linea 80");
+            // ESP_LOGW("debug Cukla http_client", "linea 80");
             cJSON *firmware_version = cJSON_GetObjectItemCaseSensitive(Jsonsito, "firmware_version");
             if (firmware_version != NULL) {
                 printf("firmware_version: %s\n", firmware_version->valuestring);
@@ -111,7 +111,7 @@ esp_err_t client_event_get_handler(esp_http_client_event_handle_t evt)
             } else {
                 ESP_LOGW(TAG_http_client, "Objeto firmware_version no encontrado o no válido\n");
             }
-            ESP_LOGW("debug Cukla http_client", "linea 90");
+            // ESP_LOGW("debug Cukla http_client", "linea 90");
             cJSON *datetime = cJSON_GetObjectItemCaseSensitive(Jsonsito, "datetime");
             if (datetime != NULL) {
                 printf("datetime: %s\n", datetime->valuestring);
@@ -121,7 +121,7 @@ esp_err_t client_event_get_handler(esp_http_client_event_handle_t evt)
             } else {
                 ESP_LOGW(TAG_http_client, "Objeto datetime no encontrado o no válido\n");
             }
-            ESP_LOGW("debug Cukla http_client", "linea 121");
+            // ESP_LOGW("debug Cukla http_client", "linea 121");
 
             // free(recv_http); // Liberar recv_http después de analizar el JSON
             // recv_http = NULL; // Establecer el puntero a NULL para evitar errores futuros

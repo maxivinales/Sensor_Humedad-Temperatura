@@ -132,7 +132,7 @@ void mqtt_task(void *parameter)
         ESP_LOGI(TAG_MQTT, "mqtt task\n");
         vTaskDelay(pdMS_TO_TICKS(1000));
         ESP_LOGW(TAG_MQTT, "Free memory: %lu bytes", esp_get_free_heap_size());
-        get_data_time("http://worldtimeapi.org/api/timezone/America/Argentina/Cordoba");
+        // get_data_time("http://worldtimeapi.org/api/timezone/America/Argentina/Cordoba");
     }
 }
 esp_err_t mqtt_launch(){

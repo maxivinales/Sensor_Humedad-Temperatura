@@ -27,8 +27,8 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         // msg_id = esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
         // ESP_LOGI(TAG_MQTT, "sent publish successful, msg_id=%d", msg_id);
 
-        // msg_id = esp_mqtt_client_subscribe(client, "/topic/qos0", 0);
-        // ESP_LOGI(TAG_MQTT, "sent subscribe successful, msg_id=%d", msg_id);
+        msg_id = esp_mqtt_client_subscribe(client, "teste", 0);
+        ESP_LOGI(TAG_MQTT, "sent subscribe successful, msg_id=%d", msg_id);
 
         // msg_id = esp_mqtt_client_subscribe(client, "/topic/qos1", 1);
         // ESP_LOGI(TAG_MQTT, "sent subscribe successful, msg_id=%d", msg_id);
@@ -126,10 +126,13 @@ void mqtt_task(void *parameter)
 
     while (1)
     {        
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(pdMS_TO_TICKS(1000));
         esp_mqtt_client_publish(client, "teste", "1234", 0, 1, 0);
         // printf("xD hasta aqui llego");
         ESP_LOGI(TAG_MQTT, "mqtt task\n");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        ESP_LOGW(TAG_MQTT, "Free memory: %lu bytes", esp_get_free_heap_size());
+        get_data_time("http://worldtimeapi.org/api/timezone/America/Argentina/Cordoba");
     }
 }
 esp_err_t mqtt_launch(){

@@ -70,7 +70,7 @@ void control_task(void *parameter){
         if(wifi_connection_status.value == 1){
             get_firmware_version();
             mqtt_launch();
-            get_data_time("http://worldtimeapi.org/api/timezone/America/Argentina/Cordoba");
+            
         }
         // rest_get();
         

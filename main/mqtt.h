@@ -1,6 +1,7 @@
 #ifndef MQTT_H_
 #define MQTT_H_
 #include "config.h"
+#include "http_client.h"
 
 bool mqtt_connected = false;  // Variable global para la bandera de conexión MQTT
 

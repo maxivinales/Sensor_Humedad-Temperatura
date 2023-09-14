@@ -302,5 +302,13 @@ void process_json_response(const char *json_str) {
         ESP_LOGE("JSON", "Campo JSON no encontrado");
     }
 
-    cJSON_Delete(root);
+    if(root != NULL){
+        cJSON_Delete(root);
+        root = NULL;
+    }
+    
+    if(value != NULL){
+        cJSON_Delete(value);
+        value = NULL;
+    }
 }

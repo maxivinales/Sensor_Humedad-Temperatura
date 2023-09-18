@@ -1,4 +1,5 @@
 #include "audio_task.h"
+#include "freertos/portmacro.h"
 #include "freertos/projdefs.h"
 #include <math.h>
 
@@ -12,6 +13,8 @@
 TaskHandle_t TaskHandle_aux;                                    // "variable para manejar las tareas"
 
 cmd_audio_weighting_t ponderacion = A;
+
+extern QueueHandle_t msg_queue_to_mqtt_send;
 
 extern void filtro_II_d_I(float* muestra_p, float* _x, float* _y, float* _SOS);    // filtro
 extern void casting_y_escala(int muestra_cuentas, float* muestra_p, float* k_veces_to_p);
@@ -30,10 +33,17 @@ void aux_task(void *parameter){
     printf("Iniciando audio_task\n"); 
 
     // test_unitario_filtro();      // este era para probar esta funcionalidad nada mas
+    struct data_mqtt_send_t teste = {
+        .topic = "test",
+        .payload = "hola mundo",
+        .qos = ONE_TIME,
+        .retain = false,
+    };
 
     while (1)
     {
-        vTaskDelay(pdMS_TO_TICKS(20));
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        xQueueSend(msg_queue_to_mqtt_send, &teste, portMAX_DELAY);
     }
 }
 

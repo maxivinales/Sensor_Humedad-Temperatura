@@ -134,12 +134,31 @@ typedef enum    //definimos un tipo de datos categoricos, para trabajar mas como
     C
 } cmd_audio_weighting_t;
 
+typedef enum{
+    AT_MOST_ONCE,   // envia una vez, puede que llegue o no
+    ONE_OR_MORE,    // envia y espera el recibido, puede llegar el mensaje mas de una vez
+    ONE_TIME        // hace llegar exactamente un mensaje a destino, es el mas costoso computacionalmente
+}QOS_MQTT;
 
 struct data_t{
-    cmd_control_t cmd;  //mensaje de control
+    // cmd_control_t cmd;  //mensaje de control
     int value;          //valor entero que se puede usar depende de lo que uno necesite
     float value_f;      //valor flotante que se puede usar depende de lo que uno necesite
     char  value_str[32]; //string que se puede usar depende de lo que uno necesite
+};
+
+struct data_control_t{      // datos que llegan desde MQTT al doi
+    cmd_control_t cmd;
+    int value;          //valor entero que se puede usar depende de lo que uno necesite
+    float value_f;      //valor flotante que se puede usar depende de lo que uno necesite
+    char  value_str[256]; //string que se puede usar depende de lo que uno necesite
+};
+
+struct data_mqtt_send_t{
+    char topic[32];         // el topic se construye en el destino: NOMBRE_PRODUCTO/CHIPID/$topic <- esta ultima es el topic de la estructura
+    char payload[256];
+    QOS_MQTT qos;
+    bool retain;
 };
 
 esp_err_t loadConfig();

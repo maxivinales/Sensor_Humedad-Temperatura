@@ -106,7 +106,7 @@ void control_task(void *parameter){
 }
 
 esp_err_t control_launch(){
-    msg_queue_toControl = xQueueCreate(MSG_QUEUE_LENGTH, sizeof(struct data_t));
+    msg_queue_toControl = xQueueCreate(MSG_QUEUE_LENGTH, sizeof(struct data_control_t));
 
     xTaskCreatePinnedToCore(             // Use xTaskCreate() in vanilla FreeRTOS
         control_task,        // Function to be called

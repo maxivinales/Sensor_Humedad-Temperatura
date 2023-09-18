@@ -1,10 +1,19 @@
 #include "mqtt.h"
+#include "config.h"
 #include "esp_err.h"
+#include "esp_log.h"
 #include "mqtt_client.h"
+#include <stddef.h>
 #include <string.h>
 
+#define LEN_QUEUE_MQTT 10
+
 TaskHandle_t TaskHandle_mqtt = NULL;
-// QueueHandle_t msg_queue_toControl = NULL;
+QueueHandle_t msg_queue_to_mqtt_send = NULL;
+
+extern QueueHandle_t msg_queue_toControl;
+
+esp_err_t sender_mqtt(esp_mqtt_client_handle_t _client , struct data_mqtt_send_t *msj);
 
 static const char *TAG_MQTT = "MQTT_EXAMPLE";
 
@@ -133,16 +142,26 @@ void mqtt_task(void *parameter)
 
     while (1)
     {        
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        // esp_mqtt_client_publish(client, "teste", "1234", 0, 1, 0);
-        // printf("xD hasta aqui llego");
-        ESP_LOGI(TAG_MQTT, "mqtt task\n");
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        ESP_LOGW(TAG_MQTT, "Free memory: %lu bytes", esp_get_free_heap_size());
+        // vTaskDelay(pdMS_TO_TICKS(1000));
+        // // esp_mqtt_client_publish(client, "teste", "1234", 0, 1, 0);
+        // // printf("xD hasta aqui llego");
+        // ESP_LOGI(TAG_MQTT, "mqtt task\n");
+        // vTaskDelay(pdMS_TO_TICKS(1000));
+        // ESP_LOGW(TAG_MQTT, "Free memory: %lu bytes", esp_get_free_heap_size());
         // get_data_time("http://worldtimeapi.org/api/timezone/America/Argentina/Cordoba");
+        // struct data_mqtt_send_t received_msj;
+        void *_pv_buffer = malloc(sizeof(struct data_mqtt_send_t));
+        if (xQueueReceive(msg_queue_to_mqtt_send, _pv_buffer, portMAX_DELAY)) {
+            // printf("Consumidor recibió: %d\n", received_value);
+            esp_err_t _err = ESP_OK;
+            
+            sender_mqtt(client, (struct data_mqtt_send_t*)_pv_buffer);
+        }
+        free(_pv_buffer);
     }
 }
 esp_err_t mqtt_launch(){
+    esp_err_t _err = ESP_OK;
     if(TaskHandle_mqtt == NULL){
         //msg_queue_toControl = xQueueCreate(MSG_QUEUE_LENGTH, sizeof(struct data_t));
         xTaskCreatePinnedToCore(             // Use xTaskCreate() in vanilla FreeRTOS
@@ -153,11 +172,24 @@ esp_err_t mqtt_launch(){
             3,                   // Task priority
             &TaskHandle_mqtt, // Task handle
             APP_CORE);              // Run on one core for demo purposes (ESP32 only)
-        return(ESP_OK);                     // con este tipo de comandos indico si algo no sale bien
+        // return(ESP_OK);                     // con este tipo de comandos indico si algo no sale bien
     }else{
         ESP_LOGE(TAG_MQTT, "Tarea ya creada");
         return(ESP_FAIL);
     }
+
+    if(msg_queue_to_mqtt_send == NULL){
+        msg_queue_to_mqtt_send = xQueueCreate(LEN_QUEUE_MQTT, sizeof(struct data_mqtt_send_t));
+        if(msg_queue_to_mqtt_send == NULL){
+            ESP_LOGE(TAG_MQTT, "error creando la cola");
+            return(ESP_FAIL);
+        }
+    }else{
+        ESP_LOGE(TAG_MQTT, "Cola ya creada");
+        return(ESP_FAIL);
+    }
+
+    return(_err);
 }
 /*
 esp_err_t control_kill(){
@@ -174,3 +206,24 @@ esp_err_t control_kill(){
     return(ESP_OK);                     // con este tipo de comandos indico si algo no sale bien
 }
 */
+
+
+
+esp_err_t sender_mqtt(esp_mqtt_client_handle_t _client , struct data_mqtt_send_t *msj){
+    ESP_LOGI(TAG_MQTT, "enviando msj mqtt a broker");
+    int msj_id;
+    char _topic[96];
+    snprintf(_topic, 96, "%s/%s/%s", NOMBRE_PRODUCTO, CHIPID.value_str, msj->topic);
+    msj_id = esp_mqtt_client_publish(_client, _topic, msj->payload, sizeof(msj->payload), msj->qos, msj->retain);
+    if(msj->qos != AT_MOST_ONCE){
+        if(msj_id != -1){
+            ESP_LOGI(TAG_MQTT, "msj id = %d", msj_id);
+            return(ESP_OK);
+        }else{
+            ESP_LOGE(TAG_MQTT, "error enviando msj mqtt a broker");
+            return(ESP_FAIL);
+        }
+    }else{
+        return(ESP_OK);
+    }
+}   

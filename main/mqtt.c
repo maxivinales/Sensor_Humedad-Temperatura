@@ -76,6 +76,12 @@ void mqtt_task(void *parameter)
 {
     esp_mqtt_client_config_t mqtt_cfg = {
         .broker.address.uri = MQTT_URL_FANIOT,
+        .credentials = {
+            .username = "test_SC",
+            .authentication = {
+                .password = "faniot123",
+            },
+        },
         // .credentials = {
         //     .username = "username",
         //     .authentication = {

@@ -1,8 +1,9 @@
 #include "mqtt.h"
+#include "esp_err.h"
 #include "mqtt_client.h"
 #include <string.h>
 
-TaskHandle_t TaskHandle_mqtt;
+TaskHandle_t TaskHandle_mqtt = NULL;
 // QueueHandle_t msg_queue_toControl = NULL;
 
 static const char *TAG_MQTT = "MQTT_EXAMPLE";
@@ -27,8 +28,8 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         // msg_id = esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
         // ESP_LOGI(TAG_MQTT, "sent publish successful, msg_id=%d", msg_id);
 
-        msg_id = esp_mqtt_client_subscribe(client, "teste", 0);
-        ESP_LOGI(TAG_MQTT, "sent subscribe successful, msg_id=%d", msg_id);
+        // msg_id = esp_mqtt_client_subscribe(client, "teste", 0);
+        // ESP_LOGI(TAG_MQTT, "sent subscribe successful, msg_id=%d", msg_id);
 
         // msg_id = esp_mqtt_client_subscribe(client, "/topic/qos1", 1);
         // ESP_LOGI(TAG_MQTT, "sent subscribe successful, msg_id=%d", msg_id);
@@ -77,9 +78,9 @@ void mqtt_task(void *parameter)
     esp_mqtt_client_config_t mqtt_cfg = {
         .broker.address.uri = MQTT_URL_FANIOT,
         .credentials = {
-            .username = "test_SC",
+            .username = data_MQTT_SC.User,//"test_SC",
             .authentication = {
-                .password = "faniot123",
+                .password = data_MQTT_SC.pass,//"faniot123",
             },
         },
         // .credentials = {
@@ -133,7 +134,7 @@ void mqtt_task(void *parameter)
     while (1)
     {        
         vTaskDelay(pdMS_TO_TICKS(1000));
-        esp_mqtt_client_publish(client, "teste", "1234", 0, 1, 0);
+        // esp_mqtt_client_publish(client, "teste", "1234", 0, 1, 0);
         // printf("xD hasta aqui llego");
         ESP_LOGI(TAG_MQTT, "mqtt task\n");
         vTaskDelay(pdMS_TO_TICKS(1000));
@@ -142,16 +143,21 @@ void mqtt_task(void *parameter)
     }
 }
 esp_err_t mqtt_launch(){
-    //msg_queue_toControl = xQueueCreate(MSG_QUEUE_LENGTH, sizeof(struct data_t));
-    xTaskCreatePinnedToCore(             // Use xTaskCreate() in vanilla FreeRTOS
-        mqtt_task,        // Function to be called
-        "mqtt_task",          // Name of task
-        10000,             // Stack size (bytes in ESP32, words in FreeRTOS)
-        NULL,              // Parameter to pass
-        3,                   // Task priority
-        &TaskHandle_mqtt, // Task handle
-        APP_CORE);              // Run on one core for demo purposes (ESP32 only)
-    return(ESP_OK);                     // con este tipo de comandos indico si algo no sale bien
+    if(TaskHandle_mqtt == NULL){
+        //msg_queue_toControl = xQueueCreate(MSG_QUEUE_LENGTH, sizeof(struct data_t));
+        xTaskCreatePinnedToCore(             // Use xTaskCreate() in vanilla FreeRTOS
+            mqtt_task,        // Function to be called
+            "mqtt_task",          // Name of task
+            10000,             // Stack size (bytes in ESP32, words in FreeRTOS)
+            NULL,              // Parameter to pass
+            3,                   // Task priority
+            &TaskHandle_mqtt, // Task handle
+            APP_CORE);              // Run on one core for demo purposes (ESP32 only)
+        return(ESP_OK);                     // con este tipo de comandos indico si algo no sale bien
+    }else{
+        ESP_LOGE(TAG_MQTT, "Tarea ya creada");
+        return(ESP_FAIL);
+    }
 }
 /*
 esp_err_t control_kill(){

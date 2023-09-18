@@ -3,12 +3,15 @@
 #include "Leq_task.c"
 #include "audio_task.c"
 #include "WiFi_manager.c"
+#include "config.h"
+#include "esp_log.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "freertos/projdefs.h"
 #include "ota.c"
 #include "http_client.c"
 #include "mqtt.c"
+#include <stdio.h>
 
 // #include "config.h"
 // #include "Leq_task.c"
@@ -69,7 +72,21 @@ void control_task(void *parameter){
         if(wifi_connection_status.value == 1){
             get_firmware_version(CHIPID.value_str);
             mqtt_launch();
-            
+            int cont_mqtt_start = 0;
+            ESP_LOGI(TAG_CONTROL, "Intentando conectarse a broker MQTT %s, user = %s , pass = %s", MQTT_URL_FANIOT, data_MQTT_SC.User, data_MQTT_SC.pass);
+            while (cont_mqtt_start < 600 && mqtt_connected == false) {
+                vTaskDelay(pdMS_TO_TICKS(100));
+                cont_mqtt_start++;
+                printf("cont_mqtt  = %d\n", cont_mqtt_start);
+            }
+
+            if(!mqtt_connected){
+                mode_WiFi_manager.value = 0;
+                // ver de poner una alarma o algo
+                saveConfig();
+                vTaskDelay(pdMS_TO_TICKS(100));
+                esp_restart();
+            }
         }
         // rest_get();
         

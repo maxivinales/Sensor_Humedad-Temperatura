@@ -1,7 +1,9 @@
 #include "WiFi_manager.h"
+#include "config.h"
 #include "esp_err.h"
 
 #include "freertos/projdefs.h"
+#include "mqtt.h"
 // #include "ota.c"
 
 static const char *TAG_WiFi_Manager = "prueba WiFi manager";
@@ -792,12 +794,25 @@ static esp_err_t connect_post_handler(httpd_req_t *req)
                 uint8_t *aux2;
                 aux2 = &AP_data.ssid[0];
                 aux = (char*)aux2;
+
+                char response[128];
+                if(mqtt_connected){
+                    snprintf(response, 128, "{\"WiFi SSID\":\"%s\",\"MQTT user\":\"%s\"}", aux, data_MQTT_SC.User);
+                }else{
+                    snprintf(response, 128, "{\"WiFi SSID\":\"%s\",\"MQTT user\":\"%s\"}", aux, "none");
+                }
+                aux = &response[0];
+
+                httpd_resp_set_status(req, http_200_hdr);
+                httpd_resp_set_type(req, http_content_type_json);
                 httpd_resp_send(req, aux, strlen(aux));
             }   
             requested_actions = requested_actions>>1;   // corro 1 bit a la derecha
             if(requested_actions&1){    // bit 2
                 ESP_LOGW(TAG_WiFi_Manager, "bit 2: pendiente aún, acá debería conectarse al broker mqtt\n");// debug Cukla
-                // ACA DEBO TRABAJAR
+                saveConfig();
+                mqtt_launch();
+                httpd_resp_send(req, "Intentando conectar a MQTT", strlen("Intentando conectar a MQTT"));
             }
             requested_actions = requested_actions>>1;   // corro 1 bit a la derecha
             if(requested_actions&1){    // bit 3
@@ -814,8 +829,19 @@ static esp_err_t connect_post_handler(httpd_req_t *req)
                 aux2 = &AP_data.ssid[0];
                 aux = (char*)aux2;
                 if(strcmp(aux, "") == 0){
-                    httpd_resp_send(req, "Conectese a una red antes", strlen("Conectese a una red antes"));
-                }else{
+                    httpd_resp_set_status(req, http_400_hdr);
+                    httpd_resp_set_type(req, http_content_type_json);
+                    httpd_resp_send(req, "No conectado a WiFi, conectese a una red SSID y contraseña validos", strlen("No conectado a WiFi, conectese a una red SSID y contraseña validos"));
+                }else if(mqtt_connected == false){
+                    httpd_resp_set_status(req, http_400_hdr);
+                    httpd_resp_set_type(req, http_content_type_json);
+                    httpd_resp_send(req, "Falla en conexión a MQTT, escriba un usuario y contraseña validos", strlen("Falla en conexión a MQTT, escriba un usuario y contraseña validos"));
+                }
+                else{
+                    httpd_resp_set_status(req, http_200_hdr);
+                    httpd_resp_set_type(req, http_content_type_json);
+                    httpd_resp_send(req, "Pasando a modo de trabajo STA, el WiFi manager se apagará", strlen("Pasando a modo de trabajo STA, el WiFi manager se apagará"));
+                    vTaskDelay(pdMS_TO_TICKS(1000));
                     // wifi_deinit_softap();
                     // corroboro que esté guardado ok la red
                     _err = nvs_open("storage", NVS_READWRITE, &handle_NVS);

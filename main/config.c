@@ -39,6 +39,15 @@ esp_err_t loadConfig(){
 
         ret = nvs_get_i32(handle_NVS, "WifiMode", (int32_t*)(&mode_WiFi_manager.value));         // recupero modo de autentificación de WiFi
         printf((ret != ESP_OK) ? "Get WifiMode failed!\n" : "Get WifiMode done\n");
+
+        //data_MQTT_SC
+        size_aux = sizeof(data_MQTT_SC.User);
+        ret = nvs_get_str(handle_NVS, "user_mqtt", &data_MQTT_SC.User[0], &size_aux);        // recupero SSID de WiFi
+        printf((ret != ESP_OK) ? "Get user_mqtt failed!\n" : "Get user_mqtt done\n");
+
+        size_aux = sizeof(data_MQTT_SC.pass);
+        ret = nvs_get_str(handle_NVS, "pass_mqtt", &data_MQTT_SC.pass[0], &size_aux);        // recupero pass de WiFi
+        printf((ret != ESP_OK) ? "Get pass_mqtt failed!\n" : "Get pass_mqtt done\n");
         
         nvs_commit(handle_NVS);
     }
@@ -82,7 +91,7 @@ esp_err_t saveConfig(){
         _err = nvs_set_str(handle_NVS, "pass", data_WiFi_SC.pass);          // guardo contraseña WiFi 
         printf((_err != ESP_OK) ? "save pass failed!\n" : "save pass done\n");
 
-        _err =nvs_set_u32(handle_NVS, "authmode", (uint32_t)data_WiFi_SC.authmode);// guardo modo de autentificación WiFi
+        _err =nvs_set_u32(handle_NVS, "authmode" ,(uint32_t)data_WiFi_SC.authmode);// guardo modo de autentificación WiFi
         printf((_err != ESP_OK) ? "save authmode failed!\n" : "save authmode done\n");
 
         _err = nvs_set_str(handle_NVS, "CHIPID", CHIPID.value_str);         // guardo CHIPID
@@ -93,6 +102,12 @@ esp_err_t saveConfig(){
 
         _err =nvs_set_i32(handle_NVS, "WifiMode", mode_WiFi_manager.value); // guardo mestado del WiFi manager
         printf((_err != ESP_OK) ? "save WifiMode failed!\n" : "save WifiMode done\n");
+
+        _err = nvs_set_str(handle_NVS, "user_mqtt", data_MQTT_SC.User);          // guardo user mqtt
+        printf((_err != ESP_OK) ? "save user_mqtt failed!\n" : "save user_mqtt done\n");
+
+        _err = nvs_set_str(handle_NVS, "pass_mqtt", data_MQTT_SC.pass);          // guardo contraseña mqtt 
+        printf((_err != ESP_OK) ? "save pass_mqtt failed!\n" : "save pass_mqtt done\n");
 
         printf("Committing updates in NVS ... ");
         _err = nvs_commit(handle_NVS);

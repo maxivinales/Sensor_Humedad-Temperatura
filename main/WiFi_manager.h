@@ -67,7 +67,7 @@ extern const uint8_t index_html_end[] asm("_binary_index_html_end");
 /* const httpd related values stored in ROM */
 const static char http_200_hdr[] = "200 OK";
 // const static char http_302_hdr[] = "302 Found";
-// const static char http_400_hdr[] = "400 Bad Request";
+const static char http_400_hdr[] = "400 Bad Request";
 // const static char http_404_hdr[] = "404 Not Found";
 // const static char http_503_hdr[] = "503 Service Unavailable";
 // const static char http_location_hdr[] = "Location";

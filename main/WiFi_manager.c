@@ -1118,8 +1118,7 @@ static esp_err_t stop_webserver(httpd_handle_t server)  // para detener el servi
     return httpd_stop(server);
 }
 
-static void connect_handler(void* arg, esp_event_base_t event_base,
-                            int32_t event_id, void* event_data)
+static void connect_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
     httpd_handle_t* server = (httpd_handle_t*) arg;
     if (*server == NULL) {
@@ -1129,8 +1128,7 @@ static void connect_handler(void* arg, esp_event_base_t event_base,
 }
 
 // funcion para detener la pila de eventos relacionada con http
-static void disconnect_handler(void* arg, esp_event_base_t event_base,
-                               int32_t event_id, void* event_data)
+static void disconnect_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
     httpd_handle_t* server = (httpd_handle_t*) arg;
     ESP_LOGW(TAG_WiFi_Manager, "linea 502");// debug Cukla

@@ -154,6 +154,139 @@ task_kill(){
 Las tareas generalmente tienen 2 archivos:
 - *task.h*: en el header se llaman a las dependencias de la tarea y se definen los métodos de la misma. También se definen constantes y lo que uno quiera definir y no tenga que estar dentro de una función de la tarea.
 - *task.c*: aca está el cuerpo de los métodos y la tarea principal que tiene el bucle. Esta es la que se llama desde donde se quiera lanzar la tarea.
+### ***WiFi Manager***
+Es el servidor web que proporciona la interfáz inicial hombre-maquina para configurar el dispositivo por primera vez, y eventualmente al mudarlo de lugar. También proporciona la interfáz de conexión WiFi mientras el dispositivo está en funcionamiento. A continuación se describirán tanto el frontend como el backend (en caso de seguir desarrollando).
+#### ***Backend***
+Consta de una serie de funciones y métodos encargados de:
+- En caso de necesitar configuraciones básicas (WiFi y MQTT), lanzar el servidor web con sus endpoints y el frontend.
+- En caso de tener configurado correctamente WiFi y MQTT, lanzar el "*handler*" que maneja la conexión WiFi.
+##### ***Métodos***
+- Encargados de manejo de la pila TCP/IP:
+
+**tcpip_init_AP**: Inicia la pila TCP/IP para que la ESP trabaje en modo AP (Access Point, generando una red WiFi).
+```c
+esp_err_t tcpip_init_AP(void);
+```
+**tcpip_deinit_AP**: Destructor de la pila TCP/IP para que la ESP trabaje en modo AP (Access Point, generando una red WiFi). **Usar con cuidado, no está 100% probado.**
+```c
+esp_err_t tcpip_deinit_AP(void);
+```
+**tcpip_init_STA**: Inicia la pila TCP/IP para que la ESP trabaje en modo STA (Estación WiFi, conectado a un access point, el modem de tu casa, etc.).
+```c
+esp_err_t tcpip_init_STA(void);
+```
+**tcpip_deinit_STA**: Destructor de la pila TCP/IP para que la ESP trabaje en modo STA. **Usar con cuidado, no está 100% probado.**
+```c
+esp_err_t tcpip_deinit_AP(void);
+```
+**init_loop_default**: Genera el loop que maneja TCP/IP.
+```c
+esp_err_t init_loop_default(void);
+```
+**deinit_loop_default**: Destructor del loop que maneja TCP/IP. **Usar con cuidado, no está 100% probado.**
+```c
+void deinit_loop_default(void);
+```
+
+**Se recomienda arrancar la ESP en un modo, y resetearla para cambiar de modo, debido a que al destruir una pila TCP/IP y luego crear otra pasan cosas extrañas que no se entienden del todo**🙊
+
+- Encargados de manejar los modos WiFi:
+
+**wifi_init_softap**: Pone a la ESP32 en modo AP (Access Point), lanzando una red WiFi desde la ESP.
+```c
+esp_err_t wifi_init_softap(void);
+```
+**wifi_deinit_softap**: Saca a la ESP de modo AP y desactiva el WiFi.
+```c
+esp_err_t wifi_deinit_softap(void);
+```
+**wifi_init_sta**: Inicia la ESP en modo STA (Estación), recibe como argumentos los datos para conectarse a una red.
+```c
+esp_err_t wifi_init_sta(struct WiFi_data_t _net);
+```
+**wifi_deinit_wifi_deinit_staapsta**: Saca a la ESP de modo STA y desactiva el WiFi.
+```c
+void wifi_deinit_sta(void);
+```
+**wifi_init_apsta**: Inicia la ESP en modo APSTA (Acces Point y Estación al mismo tiempo), recibe como argumentos los datos para conectarse a una red.
+```c
+esp_err_t wifi_init_apsta(struct WiFi_data_t _net);
+```
+**wifi_deinit_apsta**: Saca a la ESP de modo APSTA y desactiva el WiFi.
+```c
+void wifi_deinit_apsta(void);
+```
+- Funciones relacionadas con HTTP
+
+**start_webserver**: Inicia el servidor web, lanzando todos los endpoints que se detallan en este documento.
+```c
+static httpd_handle_t start_webserver(void);
+```
+
+**stop_webserver**: Mata el servior web.
+```c
+static esp_err_t stop_webserver(httpd_handle_t server);
+```
+
+**connect_handler**: inicia el servidor web de manera segura, y maneja los eventos referidos a http.
+```c
+static void connect_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
+```
+
+**disconnect_handler**: mata el servidor web de manera segura.
+```c
+static void disconnect_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
+```
+
+**connect_post_handler**: maneja los post hechos al endpoint "/connect". Dentro tiene una lógica de corrimiento de bits para saber que evento se solicitó mediante post.
+```c
+static esp_err_t connect_post_handler(httpd_req_t *req);
+```
+
+**http_404_error_handler**: Entiendo que maneja las solicitudes erroneas, sin embargo se heredó del ejemplo de servidor http practicamente sin modificaciones.
+```c
+esp_err_t http_404_error_handler(httpd_req_t *req, httpd_err_code_t err);
+```
+
+**WiFi_Manager_handler**: maneja el endpoint "/", donde se entra al frontend del WiFi manager.
+```c
+static esp_err_t WiFi_Manager_handler(httpd_req_t *req);
+```
+
+**JS_handler**: maneja el endpoint "/script.js", donde se accede al código fuente de JavaScript para el frontend.
+```c
+static esp_err_t JS_handler(httpd_req_t *req);
+```
+
+**CSS_handler**: maneja el endpoint "/styles.css", donde se accede al código fuente de JavaScript para el frontend.
+```c
+static esp_err_t CSS_handler(httpd_req_t *req);
+```
+
+**WiFi_PullNets**: maneja el endpoint "/index.js/PullNets", donde se solicita a la ESP que devuelva las redes disponibles en formato JSON al frontend.
+```c
+static esp_err_t WiFi_PullNets(httpd_req_t *req);
+```
+
+**cors_options_handler**: maneja el endpoint "*", que maneja el CORS.
+```c
+static esp_err_t cors_options_handler(httpd_req_t *req);
+```
+
+- Funciones auxiliares
+
+**buildJsonNets**: Genera el JSON con las redes disponibles.
+```c
+void buildJsonNets(char* _Json, wifi_ap_record_t* _redes, uint32_t _size);
+```
+
+**decode_Json**: Decodifica los mensajes enviados por post a "/connect", según un formato predefinido. 
+```c
+uint32_t decode_Json(const char* _Json, struct WiFi_data_t *WiFi_data, struct MQTT_user_data_t *MQTT_data);
+```
+
+##### ***Enpoints y "sub-endpoints"***
+Aca debería explicar que se manda a cada endpoint y que se espera recibir.
 
 ### ***main***
 aca simplemente se debería llamar a *config.c* y *logica_control.c*, quedando sin loop infinito, ya que de esto se encargarán las tareas.

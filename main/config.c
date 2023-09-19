@@ -1,4 +1,7 @@
 #include "config.h"
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
 static const char *TAG_CONFIG = "Configuracion";
 
@@ -65,6 +68,13 @@ esp_err_t loadConfig(){
     // aux_S2 = &CHIPID.value_str[0];
     // strncat()
     // snprintf(&SSID_WiFi_Manager.value_str[0], sizeof(SSID_WiFi_Manager.value_str), "Sonometro (%s)", aux_S);
+
+    if(topic_control == NULL){
+        size_t len_topic_control;
+        len_topic_control = strlen(NOMBRE_PRODUCTO) + strlen(CHIPID.value_str) + strlen("UserControl") + 2*strlen("/") + 1;
+        topic_control = malloc(len_topic_control);
+        snprintf(topic_control, len_topic_control, "%s/%s/UserControl", NOMBRE_PRODUCTO, CHIPID.value_str);
+    }
 
     return(ESP_OK);
 }

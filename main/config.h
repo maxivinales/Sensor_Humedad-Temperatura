@@ -86,7 +86,7 @@
 #define MPI 3.14159265358979323846
 #endif
 
-#define MSG_QUEUE_LENGTH 20
+#define MSG_QUEUE_LENGTH 10
 #define MSG_QUEUE_TOSENSOR_LENGTH 5
 
 #define NOMBRE_PRODUCTO "Sonometro"
@@ -124,7 +124,10 @@ struct MQTT_user_data_t{
 typedef enum    //definimos un tipo de datos categoricos, para trabajar mas comodamente
 {               //puede tomar uno de los valores a continuacion
     NADA,
-    SAVE
+    SAVE,
+    ERROR_RECEPCION,
+    TEST,
+    WIFI_MANAGER_START
 } cmd_control_t;
 
 typedef enum    //definimos un tipo de datos categoricos, para trabajar mas comodamente
@@ -169,6 +172,7 @@ esp_err_t get_chipid();
 // Variables
 struct WiFi_data_t data_WiFi_SC;
 struct MQTT_user_data_t data_MQTT_SC;
+char *topic_control = NULL;        // topico al que se suscribe para recibir comandos del usuario
 
 nvs_handle_t handle_NVS;   // para guardar SSID y pass
 

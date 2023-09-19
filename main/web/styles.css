@@ -156,27 +156,10 @@ table{
 }
 
 table td{
-    text-align: center;
+    text-align: left;
     color: var(--btncolor);
     font-size: larger;
     font-weight: 600;
-}
-
-#SSID {
-    text-align: left;
-}
-
-#lock_icon {
-    text-align: left;
-    margin: 2%;
-    /* width: 30px; */
-    width:max-content;
-}
-
-#signal_icon {
-    text-align: right;
-    /* width: 30px; */
-    width:max-content;
 }
 
 #header {
@@ -194,4 +177,441 @@ table td{
     filter: drop-shadow(1px 5px 5px #918989);
     transition: 0.3s;
     transform: scale(1.01);
+}
+
+@media (max-width: 800px){
+    .container{
+        width: 60%;
+        height: max-content !important;
+    }
+
+    select,
+    input[type = "text"]{
+        width: 27rem;
+    }
+
+    select,
+    input[type = "password"]{
+        width: 27rem;
+    }
+
+    #button-container{
+        margin-top: 1rem;
+        display: grid;
+        width: fit-content;
+        padding-right: 1.5rem;
+    }
+
+    #button-container button{
+        margin-bottom: 1rem;
+    }
+
+    #list-container{
+        width: 80%;
+    }
+}
+
+@media (max-width: 770px){
+    .container{
+        width: 60%;
+        height: max-content !important;
+    }
+
+    select,
+    input[type = "text"]{
+        width: 27rem;
+    }
+
+    select,
+    input[type = "password"]{
+        width: 27rem;
+    }
+
+    #button-container{
+        padding-right: 5rem;
+        margin-top: 1rem;
+        display: grid;
+        width: fit-content;
+    }
+
+    #button-container button{
+        margin-bottom: 1rem;
+    }
+
+    #list-container{
+        width: 80%;
+    }
+}
+
+@media (max-width: 740px){
+    .container{
+        width: 60%;
+        height: max-content !important;
+    }
+
+    select,
+    input[type = "text"]{
+        width: 29em;
+    }
+
+    select,
+    input[type = "password"]{
+        width: 29em;
+    }
+
+    #button-container{
+        margin-top: 1rem;
+        display: grid;
+        width: fit-content;
+    }
+
+    #button-container button{
+        margin-bottom: 1rem;
+    }
+
+    #list-container{
+        width: 80%;
+    }
+}
+
+@media (max-width: 700px){
+    .container{
+        width: 70%;
+        height: max-content !important;
+    }
+
+    select,
+    input[type = "text"]{
+        width: 32em;
+    }
+
+    select,
+    input[type = "password"]{
+        width: 32em;
+    }
+
+    #button-container{
+        margin-top: 1rem;
+        padding-left: 4em;
+        display: grid;
+        width: fit-content;
+    }
+
+    #button-container button{
+        margin-bottom: 1rem;
+    }
+
+    #list-container{
+        width: 80%;
+    }
+}
+
+@media (max-width: 660px){
+    .container{
+        width: 74%;
+        height: max-content !important;
+    }
+
+    select,
+    input[type = "text"]{
+        width: 30em;
+    }
+
+    select,
+    input[type = "password"]{
+        width: 30em;
+    }
+
+    #button-container{
+        margin-top: 1rem;
+        padding-left: 2em;
+        display: grid;
+        width: fit-content;
+    }
+
+    #button-container button{
+        margin-bottom: 1rem;
+    }
+
+    #list-container{
+        width: 80%;
+    }
+}
+
+@media (max-width: 588px){
+    .container{
+        width: 78%;
+        height: max-content !important;
+    }
+
+    select,
+    input[type = "text"]{
+        width: 30em;
+    }
+
+    select,
+    input[type = "password"]{
+        width: 30em;
+    }
+
+    #button-container{
+        margin-top: 1rem;
+        padding-left: 2em;
+        display: grid;
+        width: fit-content;
+    }
+
+    #button-container button{
+        margin-bottom: 1rem;
+    }
+
+    #list-container{
+        width: 80%;
+    }
+}
+
+@media (max-width: 550px){
+    .container{
+        width: 80%;
+        height: max-content !important;
+    }
+
+    select,
+    input[type = "text"]{
+        width: 29em;
+    }
+
+    select,
+    input[type = "password"]{
+        width: 29em;
+    }
+
+    #button-container{
+        margin-top: 1rem;
+        display: grid;
+        width: fit-content;
+    }
+
+    #button-container button{
+        margin-bottom: 1rem;
+    }
+
+    #list-container{
+        width: 80%;
+    }
+}
+
+@media (max-width: 550px){
+    .container{
+        width: 85%;
+        height: max-content !important;
+    }
+}
+
+@media (max-width: 520px){
+    .container{
+        width: 90%;
+        height: max-content !important;
+    }
+}
+
+@media (max-width: 460px){
+    #logo{
+        width: 300px;
+    }
+
+    #connect-form{
+        width: fit-content;
+    }
+
+    .container{
+        width: 20em;
+        margin: auto;
+    }
+
+    label{
+        width: fit-content;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 600;
+        text-indent: 1vh;        
+    }
+
+    select,
+    input[type = "text"]{
+        width: 100%;
+    }
+
+    select,
+    input[type = "password"]{
+        width: 100%;
+    }
+
+    #label-input{
+        width: 90%;
+    }
+
+    .container #button-container{
+        margin: auto;
+        width: fit-content;
+        display: grid;
+        justify-items: center;
+        align-self: end; 
+        height: max-content !important; 
+        padding: 1%!important ; 
+    }
+
+    #list-container{
+        width: 80%;
+    }
+}
+
+@media (max-width: 420px){
+    #logo{
+        width: 300px;
+    }
+
+    #connect-form{
+        width: fit-content;
+    }
+
+    .container{
+        width: 20em;
+        margin: auto;
+    }
+
+    label{
+        width: fit-content;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 600;
+        text-indent: 1vh;        
+    }
+
+    select,
+    input[type = "text"]{
+        width: 100%;
+    }
+
+    select,
+    input[type = "password"]{
+        width: 100%;
+    }
+
+    #label-input{
+        width: 90%;
+    }
+
+    .container #button-container{
+        margin: auto;
+        width: fit-content;
+        display: grid;
+        justify-items: center;
+        align-self: end; 
+        height: max-content !important; 
+        padding: 1%!important ; 
+    }
+
+    #list-container{
+        width: 80%;
+    }
+}
+
+@media (max-width: 390px){
+    #logo{
+        width: 300px;
+    }
+
+    #connect-form{
+        width: fit-content;
+    }
+
+    .container{
+        width: 20em;
+        margin: auto;
+    }
+
+    label{
+        width: fit-content;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 600;
+        text-indent: 1vh;        
+    }
+
+    select,
+    input[type = "text"]{
+        width: 100%;
+    }
+
+    select,
+    input[type = "password"]{
+        width: 100%;
+    }
+
+    #label-input{
+        width: 90%;
+    }
+
+    .container #button-container{
+        margin: auto;
+        width: fit-content;
+        display: grid;
+        justify-items: center;
+        align-self: end; 
+        height: max-content !important; 
+        padding: 1%!important ; 
+    }
+
+    #list-container{
+        width: 80%;
+    }
+}
+
+
+@media (max-width: 375px){
+    #logo{
+        width: 280px;
+    }
+
+    #connect-form{
+        width: fit-content;
+    }
+
+    .container{
+        width: 18em;
+        margin: auto;
+    }
+
+    label{
+        width: fit-content;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 600;
+        text-indent: 1vh;        
+    }
+
+    select,
+    input[type = "text"]{
+        width: 100%;
+    }
+
+    select,
+    input[type = "password"]{
+        width: 100%;
+    }
+
+    #label-input{
+        width: 90%;
+    }
+
+    .container #button-container{
+        margin: auto;
+        width: fit-content;
+        display: grid;
+        justify-items: center;
+        align-self: end; 
+        height: max-content !important; 
+        padding: 1%!important ; 
+    }
+
+    #list-container{
+        width: 80%;
+    }
 }

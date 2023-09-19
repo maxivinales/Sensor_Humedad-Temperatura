@@ -43,7 +43,7 @@ void aux_task(void *parameter){
     while (1)
     {
         vTaskDelay(pdMS_TO_TICKS(2000));
-        xQueueSend(msg_queue_to_mqtt_send, &teste, portMAX_DELAY);
+        // xQueueSend(msg_queue_to_mqtt_send, &teste, portMAX_DELAY);
     }
 }
 

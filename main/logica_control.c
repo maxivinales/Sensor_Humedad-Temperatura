@@ -94,13 +94,49 @@ void control_task(void *parameter){
 
     aux_launch();   // lanzo mi tarea auxiliar, TENGO QUE CAMBIARLE EL NOMBRE
 
-    TickType_t xPeriod = pdMS_TO_TICKS(30000);
+    TickType_t xPeriod = portMAX_DELAY;//pdMS_TO_TICKS(30000);
 
+    struct data_control_t *msj_control = malloc(sizeof(struct data_control_t));
     while (1)
     {
-        if (xQueueReceive(msg_queue_toControl, (void *)&msg_queue_toControl, xPeriod) == pdTRUE){
-            printf("dentro de control task papu\n");
+        if (xQueueReceive(msg_queue_toControl, (void*)msj_control, xPeriod) == pdTRUE){
+            switch (msj_control->cmd) {
+                case NADA:
+                    // code
+                    ESP_LOGI(TAG_CONTROL, "acá no hace nada");
+                break;
+
+                case SAVE:
+                    // code
+                    ESP_LOGI(TAG_CONTROL, "supuestamente es para guardar los datos");
+                break;
+
+                case ERROR_RECEPCION:
+                    // code
+                    ESP_LOGI(TAG_CONTROL, "ERROR -> %s", msj_control->value_str);
+                break;
+
+                case TEST:
+                    // code
+                    ESP_LOGI(TAG_CONTROL, "Testeo -> %d\n%f\n%s", msj_control->value, msj_control->value_f, msj_control->value_str);
+                    ESP_LOGW(TAG_CONTROL, "Free memory: %lu bytes", esp_get_free_heap_size());
+                break;
+
+                case WIFI_MANAGER_START:
+                    // code
+                    ESP_LOGI(TAG_CONTROL, "Arranca el WiFi Manager");
+                    mode_WiFi_manager.value = 0;
+                    saveConfig();
+                    vTaskDelay(pdMS_TO_TICKS(1000));
+                    esp_restart();
+                break;
+
+                default:
+                    // coso
+                break;
+            }
         }
+        // free(msj_control);
         // vTaskDelay(pdMS_TO_TICKS(1000));        // miro cada 10 ms
     }
 }

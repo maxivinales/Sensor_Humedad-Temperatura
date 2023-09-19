@@ -1,4 +1,5 @@
 #include "mqtt.h"
+#include "cJSON.h"
 #include "config.h"
 #include "esp_err.h"
 #include "esp_log.h"
@@ -14,6 +15,7 @@ QueueHandle_t msg_queue_to_mqtt_send = NULL;
 extern QueueHandle_t msg_queue_toControl;
 
 esp_err_t sender_mqtt(esp_mqtt_client_handle_t _client , struct data_mqtt_send_t *msj);
+struct data_control_t JsonDecodeMQTTControl(char* _json);
 
 static const char *TAG_MQTT = "MQTT_EXAMPLE";
 
@@ -34,14 +36,10 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG_MQTT, "MQTT_EVENT_CONNECTED");
         mqtt_connected = true;  // Configura la bandera como verdadera
-        // msg_id = esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
-        // ESP_LOGI(TAG_MQTT, "sent publish successful, msg_id=%d", msg_id);
 
-        // msg_id = esp_mqtt_client_subscribe(client, "teste", 0);
-        // ESP_LOGI(TAG_MQTT, "sent subscribe successful, msg_id=%d", msg_id);
-
-        // msg_id = esp_mqtt_client_subscribe(client, "/topic/qos1", 1);
-        // ESP_LOGI(TAG_MQTT, "sent subscribe successful, msg_id=%d", msg_id);
+        ESP_LOGI(TAG_MQTT, "Me suscribo a: %s", topic_control);
+        msg_id = esp_mqtt_client_subscribe(client, topic_control, ONE_TIME);
+        ESP_LOGI(TAG_MQTT, "sent subscribe successful, msg_id=%d", msg_id);
 
         // msg_id = esp_mqtt_client_unsubscribe(client, "/topic/qos1");
         // ESP_LOGI(TAG_MQTT, "sent unsubscribe successful, msg_id=%d", msg_id);
@@ -61,10 +59,15 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     case MQTT_EVENT_PUBLISHED:
         ESP_LOGI(TAG_MQTT, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
         break;
-    case MQTT_EVENT_DATA:
+    case MQTT_EVENT_DATA:   // aca tengo que tomar los datos del usuario
         ESP_LOGI(TAG_MQTT, "MQTT_EVENT_DATA");
         printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
         printf("DATA=%.*s\r\n", event->data_len, event->data);
+        if(strcmp(event->topic, topic_control) == 0){
+            struct data_control_t cmd_received;
+            cmd_received = JsonDecodeMQTTControl(event->data);
+            xQueueSend(msg_queue_toControl, &cmd_received, portMAX_DELAY);
+        }
         break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(TAG_MQTT, "MQTT_EVENT_ERROR");
@@ -92,22 +95,6 @@ void mqtt_task(void *parameter)
                 .password = data_MQTT_SC.pass,//"faniot123",
             },
         },
-        // .credentials = {
-        //     .username = "username",
-        //     .authentication = {
-        //         .key_password = "pass",
-        //         .certificate = "certificate",
-        //         .certificate_len = strlen("certificate"),
-        //         .key = "key",
-        //         .key_len = NULL,
-        //         .key_password_len = NULL,
-        //         .use_secure_element = false,
-        //         .ds_data = NULL,
-        //     },
-        //     .client_id = NULL,
-        //     .set_null_client_id = true,
-        // },
-        // .broker.verification = {}
     };
 
     esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
@@ -226,4 +213,89 @@ esp_err_t sender_mqtt(esp_mqtt_client_handle_t _client , struct data_mqtt_send_t
     }else{
         return(ESP_OK);
     }
-}   
+}
+
+struct data_control_t JsonDecodeMQTTControl(char* _Json){
+    struct data_control_t _return;
+    cJSON *Jsonsito = cJSON_Parse(_Json);
+    if(Jsonsito == NULL) {
+        ESP_LOGW(TAG_MQTT, "Error al analizar el JSON\n");
+        const char *error_ptr = cJSON_GetErrorPtr();
+        if (error_ptr != NULL) {
+            printf("Error: %s\n", error_ptr);
+        }
+        _return.cmd = ERROR_RECEPCION;
+        strcpy(_return.value_str, "Error al analizar el JSON recibido\n");
+        return(_return);
+    }else{
+        cJSON *_cmd = cJSON_GetObjectItemCaseSensitive(Jsonsito, "cmd");
+        if (_cmd != NULL) {
+            printf("cmd: %d\n", _cmd->valueint);
+            _return.cmd = (cmd_control_t)(_cmd->valueint);
+        } else {
+            _return.cmd = ERROR_RECEPCION;
+            strcpy(_return.value_str, "Objeto cmd no encontrado o no válido\n");
+            return(_return);
+        }
+
+        cJSON *_value = cJSON_GetObjectItemCaseSensitive(Jsonsito, "value");
+        if (_value != NULL) {
+            printf("value: %d\n", _value->valueint);
+            _return.value = _value->valueint;
+        } else {
+            // _return.cmd = ERROR_RECEPCION;
+            // strcpy(_return.value_str, "Objeto value no encontrado o no válido\n");
+            ESP_LOGW(TAG_MQTT, "Objeto value no encontrado o no válido");
+            // return(_return);
+        }
+
+        cJSON *_value_f = cJSON_GetObjectItemCaseSensitive(Jsonsito, "value_f");
+        if (_value_f != NULL) {
+            printf("value_f: %f\n", _value_f->valuedouble);
+            _return.value_f = (float)_value_f->valuedouble;
+        } else {
+            // _return.cmd = ERROR_RECEPCION;
+            // strcpy(_return.value_str, "Objeto value no encontrado o no válido\n");
+            ESP_LOGW(TAG_MQTT, "Objeto value_f no encontrado o no válido");
+            // return(_return);
+        }
+
+        cJSON *_value_str = cJSON_GetObjectItemCaseSensitive(Jsonsito, "value_str");
+        if (_value_str != NULL) {
+            printf("value_str: %s\n", _value_str->valuestring);
+            strcpy(_return.value_str, _value_str->valuestring);
+        } else {
+            // _return.cmd = ERROR_RECEPCION;
+            // strcpy(_return.value_str, "Objeto value no encontrado o no válido\n");
+            ESP_LOGW(TAG_MQTT, "Objeto value_str no encontrado o no válido");
+            // return(_return);
+        }
+
+        // if(_cmd != NULL){
+        //     cJSON_Delete(_cmd);
+        //     _cmd = NULL;
+        // }
+
+        // if(_value != NULL){
+        //     cJSON_Delete(_value);
+        //     _value = NULL;
+        // }
+
+        // if(_value_f != NULL){
+        //     cJSON_Delete(_value_f);
+        //     _value_f = NULL;
+        // }
+
+        // if(_value_str != NULL){
+        //     cJSON_Delete(_value_str);
+        //     _value_str = NULL;
+        // }
+
+        if(Jsonsito != NULL){
+            cJSON_Delete(Jsonsito);
+            Jsonsito = NULL;
+        }
+    }
+
+    return(_return);
+}

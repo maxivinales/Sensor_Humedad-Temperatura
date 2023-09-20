@@ -47,6 +47,11 @@ El microcontrolador a utilizarse es la ESP32, la hoja de datos del mismo está e
 - **Especificaciones Técnicas según IRAM4074 y otras IRAM**
 - **Estructura del proyecto de firmware**
     - **RTOS**
+    - **WiFi Manager**
+        - **Backend**
+            - *Métodos*
+            - *Endpoints y "sub - endpoints"*
+        - **Frontend**
     - **main**
     - **config**
     - **logica_control**
@@ -360,16 +365,121 @@ uint32_t decode_Json(const char* _Json, struct WiFi_data_t *WiFi_data, struct MQ
     ```
     La respuesta es el chip id en texto plano.
 
+#### ***Frontend***
+**EXPLICAR EL FRONTEND.**
+
 ### ***main***
 aca simplemente se debería llamar a *config.c* y *logica_control.c*, quedando sin loop infinito, ya que de esto se encargarán las tareas.
 
 ### ***config***
 Esta no es una tarea de RTOS propiamente dicha, en ella están los métodos:
-- *loadconfig()*: trae la información guardada en la spiffs (dcredenciales, calibraciones, datos de versionado, etc.) y actualiza los datos en RAM.
-- *saveconfig()*: guarda los datos importantes en la memoria spiffs.
+- *loadconfig()*: trae la información guardada en la ROM (dcredenciales, calibraciones, datos de versionado, etc.) y actualiza los datos en RAM.
+- *saveconfig()*: guarda los datos importantes en la memoria ROM.
+- *get_chipid()*: guarda el chipid en el elemento CHIPID.
+
+También aquí se encuentra la definición de todas las veriables del sistema, así como las estructuras útiles y las definiciones de elementos numerados.
+
 
 ### ***logica_control***
-Lanza las demás tareas, y se encarga de recibir las peticiones del usuario y hacer en consecuencia lo que se necesite.
+Lanza las demás tareas, y se encarga de recibir las peticiones del usuario y hacer en consecuencia lo que se necesite. Recibe por cola las peticiones que el usuario envía a travéz de MQTT las ordenes.
+Se lanza con la función control_launch() y se mata con la función control_kill();
+
+### ***MQTT***
+<!-- Primero va la parte de la tarea en si, luego la explicación de las tramas -->
+Esta sección se separa en 2, en primer lugar la tarea de MQTT, y en segundo lugar la instrumentación de los mensajes (estructura del mensaje, topics, etc.).
+#### ***Tarea MQTT en RTOS***
+Se lanza mediante la función mqtt_launch(), y aún no está hecha una función para matar esta tarea debido a que es indispensable para el funcionamiento del dispositivo. Consta además de la cola llamada *msg_queue_to_mqtt_send* la cual se puede llamar desde cualquier tarea (que incluya dicha cola), para enviar mensajes al broker definido en el header de config.
+#### ***Instrumentación de mensajes MQTT***
+La cola *msg_queue_to_mqtt_send* recibe mensajes del tipo *data_mqtt_send_t*, que tiene la siguiente estructura
+```c
+struct data_mqtt_send_t{
+    char topic[32];
+    char payload[256];
+    QOS_MQTT qos;
+    bool retain;
+};
+```
+donde:
+- *topic*: es el topico del mensaje (ejemplo: Temperatura), el cual se incluirá en la parte final del tópico por defecto para este dispositivo (NombreDispositivo/ChipId/topic -> ejemplo: Sonometro/C44F33605219/Temperatura).
+- *payload*: Es la carga útil del mensaje, en nuestro caso se explica el formato de la misma en la siguiente subsección.
+- *qos*: es la calidad del servicio de MQTT, en este caso es del tipo elemento numerado *QOS_MQTT* definido en el header de config. Puede valer 0, 1 o 2, donde:
+    - 0 (AT_MOST_ONCE)= le llega al cliente como máximo 1 mensaje, no se asegura de que le haya llegado. Es el modo con menor costo computacional.
+    - 1 (ONE_OR_MORE)= le llega como mínimo 1 mensaje, asegurandose de que le lleguen si o si los mensajes al broker. Pueden llegarle mensajes repetidos.
+    - 2 (ONE_TIME) = le llega solo 1 mensaje al broker, es el que tiene mayor costo computacional.
+- *retain*: es *true* o *false*, es para que el broker retenga o no los mensajes. 
+Se puede mandar mensajes a MQTT desde cualquier tarea siempre que se incluya a *msg_queue_to_mqtt_send* en la tarea.
+##### ***Publish***
+Para publicar mensajes MQTT desde cualquier tarea llamamos a la siguiente función:
+```c
+xQueueSend(msg_queue_to_mqtt_send, &teste, portMAX_DELAY);
+```
+donde *msg_queue_to_mqtt_send* es de tipo *data_mqtt_send_t* y el payload es un JSON. En dicho JSON se pueden incluir muchos datos:
+- hora: se incluye según el siguiente formato:
+ ```JSON
+{
+        "datetime" : {
+            "date" : "DD-MM-AAAA",
+            "time" : "hh:mm:ss,msms"
+        } 
+}
+```
+- variables (sensores, variables internas, etc):  
+se incluye según el siguiente formato:
+ ```JSON
+{
+        "Variable_medida" : {
+            "magnitud" : 10.10,     // flotante
+            "unidades" : "unidades"
+        } 
+}
+```
+
+Un ejemplo de dato enviado sería el siguiente:
+
+ ```JSON
+{
+  "datetime" : {
+      "date" : "20-09-2024",
+      "time" : "12:24:15,2542"
+  },
+  "Temperatura" : {
+      "magnitud" : 30.5,
+      "unidades" : "°C"
+  } ,
+  "Humedad Relativa" : {
+      "magnitud" : 80.4,
+      "unidades" : "%"
+  }
+}
+```
+Tener en cuenta que usar espacios innesesarios en el JSON ocupan memoria.
+##### ***Suscribe***
+La ESP32 al iniciar en modo STA se suscribe al topic *(NombreDispositivo)/(ChipId)/UserControl* (ejemplo: Sonometro/C44F33605219/UserControl), a través del cual el usuario (a través de la página web correspondiente) envía instrucciones de configuración al dispositivo (ej.: actualizar firmware). Estos mensajes tienen la estructura de un JSON, según la siguiente:
+ ```JSON
+{
+  "cmd" : 0,                    // entero
+  "value" : 0,                  // entero
+  "value_f" : 0.0,              // flotante
+  "value_str": "texto a enviar" // string
+}
+```
+donde:
+- *cmd*: es el comando a ejecutar, es un numero entero que se define para cada orden a ejecutar (**UNA VEZ DEFINIDOS INCLUIR LA TABLA**). Siempre debe estar incluido en el JSON.
+- *value*: es un numero entero a utilizarse o no, según la instrucción definida en *cmd*.
+- *value_f*: es un flotante entero a utilizarse o no, según la instrucción definida en *cmd*.
+- *value_str*: es una cadena de string de como máximo 256 caracteres (incluido el final del string), a utilizarse o no, según la instrucción definida en *cmd*.
+
+Este JSON en la ESP se guarda en un objeto del tipo *data_control_t* según la siguiente estructura:
+ ```c
+struct data_control_t{
+    cmd_control_t cmd;
+    int value;
+    float value_f;
+    char  value_str[256];
+};
+```
+Luego son enviados por cola a la lógica de control, donde se ejecuta la orden del usuario.
+**MENSAJES QUE NO SIGAN DICHA ESTRUCTURA SERÁN IGNORADOS.**
 
 ### ***audio_task***
 Se encarga de calcular el nivel sonoro equivalente. También tiene implementado el test unitario del filtro de audio según la norma IRAM4074-1.

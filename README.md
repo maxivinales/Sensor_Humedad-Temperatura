@@ -55,6 +55,11 @@ El microcontrolador a utilizarse es la ESP32, la hoja de datos del mismo está e
     - **main**
     - **config**
     - **logica_control**
+    - **MQTT**
+        - **Tarea MQTT en RTOS**
+        - **Instrumentación de mensajes MQTT**
+            - *Publish*
+            - *Suscribe*
     - **audio_task**
 
 ***

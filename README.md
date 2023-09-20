@@ -286,7 +286,79 @@ uint32_t decode_Json(const char* _Json, struct WiFi_data_t *WiFi_data, struct MQ
 ```
 
 ##### ***Enpoints y "sub-endpoints"***
-Aca debería explicar que se manda a cada endpoint y que se espera recibir.
+- **"/" (192.168.4.1)**: es la url donde se ingresa al frontend desde el navegador.
+- **"/script.js" (192.168.4.1/script.js)**: es la dirección de donde se busca el código en javascript para el frontend.
+- **"/styles.css" (192.168.4.1/styles.css)**: es la dirección de donde se buscan las instrucciones en css para el front.
+- **"/index.js/PullNets" (192.168.4.1/index.js/PullNets)**: es la dirección donde se solicitan las redes disponibles a la ESP. ***se puede cambiar por "/script.js/PullNets" en el futuro para que tenga mas lógica***
+- **"/connect" (192.168.4.1/connect)**: es el endpoint al cual se envian comandos mediante POST, a los que yo llamo *sub-endpoints*, a continuación se describen los comandos que se pueden enviar por POST:
+    - **Setear SSID y password para el WiFi**: Para este caso se envía un JSON con el SSID y el pass de la red, de la siguiente forma, siendo el authmode un entero:
+    ```JSON
+    {
+        "WiFi" : {
+            "SSID" : "your SSID",
+            "Pass" : "your_pass",
+            "authmode" : authmode
+        }
+    }
+    ```
+    - **Setear usuario y password para el MQTT**: Para este caso se envía un JSON con el usuario y contraseña de MQTT previamente creados en el broker o DB encargada de la autentificación en el broker.
+    ```JSON
+    {
+        "MQTT" : {
+            "User" : "user_MQTT",
+            "Pass" : "password"
+        }
+    }
+    ```
+    Automáticamente cuando le llegan estas instrucciones, la ESP intenta conectarse primeramente a WiFi y luego a MQTT. Se pueden enviar juntas de la siguiente manera:
+    ```JSON
+    {
+        "WiFi" : {
+            "SSID" : "FAN-IOT",
+            "Pass" : "f4n10t2020",
+            "authmode" : 3
+        },
+        "MQTT" : {
+            "User" : "test_SC",
+            "Pass" : "faniot123"
+        }
+    }
+    ```
+    - **Corroborar conexión WiFi y MQTT**: Para este caso se envía un JSON a la ESP32 de la siguiente manera:
+    ```JSON
+    {
+        "WiFi_connection_request" : 1
+    }
+    ```
+    Si el valor enviado es cero no responderá nada. La respuesta consta de la red WiFi a la que está conectada la ESP, respondiendo una cadena vacía si no está conectada a nada; y el usuario MQTT con el que está logueado, respondiendo none si no está logueado, ejemplo 1:
+    ```JSON
+    {
+        "WiFi SSID": "SSID WiFi",
+        "MQTT user": "user_MQTT"
+    }
+    ```
+    Ejemplo 2:
+    ```JSON
+    {
+        "WiFi SSID": "",
+        "MQTT user": "none"
+    }
+    ```
+    Si la respuesta consta de una conexión WiFI y una conexión MQTT ya estamos listos para apagar el WiFi Manager y pasar la ESP a modo STA.
+    - **Apagar WiFi manager y pasar a modo STA**: Para este caso se envía un JSON a la ESP32 de la siguiente manera:
+    ```JSON
+    {
+        "off_WM_mode" : 1
+    }
+    ```
+    Si se envía un 0 no dará resultado. Recibe como respuesta texto plano que informa de éxito o de un problema.
+    - **Solicitar Chip ID**: Fué hecho a modo de prueba, en este caso se envía un JSON a la ESP32 de la siguiente manera:
+    ```JSON
+    {
+        "get_chipid" : 1
+    }
+    ```
+    La respuesta es el chip id en texto plano.
 
 ### ***main***
 aca simplemente se debería llamar a *config.c* y *logica_control.c*, quedando sin loop infinito, ya que de esto se encargarán las tareas.

@@ -60,6 +60,7 @@ El microcontrolador a utilizarse es la ESP32, la hoja de datos del mismo está e
         - [**Instrumentación de mensajes MQTT**](#instrumentación-de-mensajes-mqtt)
             - [*Publish*](#publish)
             - [*Suscribe*](#suscribe)
+        - [**Tópics y formatos de datos**](#topics-y-formatos-de-datos)
     - [**audio_task**](#audio_task)
 
 ***
@@ -486,6 +487,55 @@ struct data_control_t{
 Luego son enviados por cola a la lógica de control, donde se ejecuta la orden del usuario.
 **MENSAJES QUE NO SIGAN DICHA ESTRUCTURA SERÁN IGNORADOS.**
 
+#### ***Topics y formatos de datos***
+Para estructurar los topics se piensa en el siguiente formato:
+
+**(NOMBRE DE DISPOSITIVO)/(CHIP ID)/(SUPTOPICS)**
+
+Donde el nombre del dispositivo puede ser por ejemplo sonómetro, el ChipId es un código único de cada ESP32 compuesto por 12 caracteres, y el Subtopic puede ser por ejemplo el nombre de una medición o una veriable interna de interés que se envía por MQTT. De este modo, un topic al que el usuario se suscribiría podría ser:
+
+**Sonometro/C44F33605219/Leq**
+
+Esto nos permite tener tópicos únicos por dispositivo, dandonos herramientas a la hora de filtrar la información para el cliente.
+
+El formato de los datos se está discutiendo entre:
+ ```JSON
+{
+  "datetime" : {
+      "date" : "20-09-2024",
+      "time" : "12:24:15,2542"
+  },
+  "Temperatura" : {
+      "magnitud" : 30.5,
+      "unidades" : "°C"
+  } ,
+  "Humedad Relativa" : {
+      "magnitud" : 80.4,
+      "unidades" : "%"
+  }
+}
+```
+
+y:
+
+ ```JSON
+{
+  "datetime" : {
+      "date" : "20-09-2024",
+      "time" : "12:24:15,2542"
+  },
+  "data" : {
+    "Temperatura" : {
+        "magnitud" : 30.5,
+        "unidades" : "°C"
+    } ,
+    "Humedad Relativa" : {
+        "magnitud" : 80.4,
+        "unidades" : "%"
+    }
+  }
+}
+```
 ### ***audio_task***
 Se encarga de calcular el nivel sonoro equivalente. También tiene implementado el test unitario del filtro de audio según la norma IRAM4074-1.
 

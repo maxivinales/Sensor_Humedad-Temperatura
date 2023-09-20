@@ -44,23 +44,23 @@ El microcontrolador a utilizarse es la ESP32, la hoja de datos del mismo está e
 (hablar algo de RTOS)
 ## Tabla de contenidos
 
-- **Especificaciones Técnicas según IRAM4074 y otras IRAM**
-- **Estructura del proyecto de firmware**
-    - **RTOS**
-    - **WiFi Manager**
-        - **Backend**
-            - *Métodos*
-            - *Endpoints y "sub - endpoints"*
-        - **Frontend**
-    - **main**
-    - **config**
-    - **logica_control**
-    - **MQTT**
-        - **Tarea MQTT en RTOS**
-        - **Instrumentación de mensajes MQTT**
-            - *Publish*
-            - *Suscribe*
-    - **audio_task**
+- [**Especificaciones Técnicas según IRAM4074 y otras IRAM**](#especificaciones-técnicas-según-iram4074-y-otras-iram)
+- [**Estructura del proyecto de firmware**](#estructura-del-proyecto-de-firmware)
+    - [**RTOS**](#cosas-básicas-de-rtos)
+    - [**WiFi Manager**](#wifi-manager)
+        - [**Backend**](#backend)
+            - [*Métodos*](#métodos)
+            - [*Endpoints y "sub - endpoints"*](#enpoints-y-sub-endpoints)
+        - [**Frontend**](#frontend)
+    - [**main**](#main)
+    - [**config**](#config)
+    - [**logica_control**](#logica_control)
+    - [**MQTT**](#mqtt)
+        - [**Tarea MQTT en RTOS**](#tarea-mqtt-en-rtos)
+        - [**Instrumentación de mensajes MQTT**](#instrumentación-de-mensajes-mqtt)
+            - [*Publish*](#publish)
+            - [*Suscribe*](#suscribe)
+    - [**audio_task**](#audio_task)
 
 ***
 ## Especificaciones Técnicas según IRAM4074 y otras IRAM

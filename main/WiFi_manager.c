@@ -2,6 +2,7 @@
 #include "config.h"
 #include "esp_err.h"
 
+#include "esp_netif_types.h"
 #include "freertos/projdefs.h"
 #include "mqtt.h"
 // #include "ota.c"
@@ -676,6 +677,7 @@ void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id
             ESP_LOGI(TAG_WiFi_Manager, "Got IP:" IPSTR, IP2STR(&event_stagotip->ip_info.ip));
 
             wifi_connection_status.value = 1;   // levanto mi bandera de que WiFi está conectado
+            ip_status.value = 1;                // levanto mi bandera de que tengo direccion IP
 
             break;
         
@@ -689,8 +691,12 @@ void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id
         case IP_EVENT_STA_GOT_IP:
             ip_event_got_ip_t *event_stagotip = (ip_event_got_ip_t *)event_data;
             ESP_LOGI(TAG_WiFi_Manager, "Got IP:" IPSTR, IP2STR(&event_stagotip->ip_info.ip));
+            ip_status.value = 1;                // levanto mi bandera de que tengo direccion IP
+            snprintf(ip_status.value_str, sizeof(ip_status.value_str), IPSTR, IP2STR(&event_stagotip->ip_info.ip));
             break;
-        
+        case IP_EVENT_STA_LOST_IP:
+            ip_status.value = 0;                // bajo mi bandera de que tengo direccion IP
+            break;
         default:
             break;
         }
@@ -811,8 +817,21 @@ static esp_err_t connect_post_handler(httpd_req_t *req)
             if(requested_actions&1){    // bit 2
                 ESP_LOGW(TAG_WiFi_Manager, "bit 2: pendiente aún, acá debería conectarse al broker mqtt\n");// debug Cukla
                 saveConfig();
-                mqtt_launch();
-                httpd_resp_send(req, "Intentando conectar a MQTT", strlen("Intentando conectar a MQTT"));
+                httpd_resp_send(req, "Intentando conectar a MQTT...", strlen("Intentando conectar a MQTT..."));
+                int cont_mqtt_launch = 0;
+                while(ip_status.value != 1 && cont_mqtt_launch < 50){
+                    vTaskDelay(pdMS_TO_TICKS(100));
+                    cont_mqtt_launch++;
+                    ESP_LOGI(TAG_WiFi_Manager, "cont_mqtt_launch -> %d", cont_mqtt_launch);
+                }
+
+                if(ip_status.value == 1){
+                    mqtt_launch();
+                }else{
+                    ESP_LOGE(TAG_WiFi_Manager, "No está conectado a WiFi, no se puede conectar a MQTT");
+                }
+
+                
             }
             requested_actions = requested_actions>>1;   // corro 1 bit a la derecha
             if(requested_actions&1){    // bit 3

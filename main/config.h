@@ -186,6 +186,7 @@ struct data_t SSID_WiFi_Manager = {.value_str  = "Smart City"}; // nombre de la 
 struct data_t new_firmware_version = {.value_str = FIRMWARE_VERSION_DEFAULT};
 
 struct data_t wifi_connection_status = {.value = 0};
+struct data_t ip_status = {.value = 0};
 
 struct data_t fecha_y_hora;
 

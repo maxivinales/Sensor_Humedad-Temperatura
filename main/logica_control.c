@@ -130,6 +130,8 @@ void control_task(void *parameter){
                     ESP_LOGI(TAG_CONTROL, "json2:\n\n%s\n\n", json2);
                     ESP_LOGI(TAG_CONTROL, "json3:\n\n%s\n\n", json3);
                     ESP_LOGI(TAG_CONTROL, "json4:\n\n%s\n\n", json4);
+                    free(json3);
+                    free(json4);
                 break;
 
                 case WIFI_MANAGER_START:

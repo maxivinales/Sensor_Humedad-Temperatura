@@ -168,7 +168,7 @@ esp_err_t tcpip_init_AP(void){
     esp_err_t _err = ESP_OK;
     _err = esp_netif_init();                  // inicia TCP/IP
     if(_err != ESP_OK){
-        ESP_LOGE(TAG_WiFi_Manager, "LINEA 414, Error: %d", _err);
+        ESP_LOGE(TAG_WiFi_Manager, "LINEA 171, Error: %d", _err);
         return _err;
     }
 
@@ -192,7 +192,7 @@ esp_err_t tcpip_init_STA(void){
     _err = esp_netif_init();                  // inicia TCP/IP
 
     if(_err != ESP_OK){
-        ESP_LOGE(TAG_WiFi_Manager, "LINEA 414, Error: %d", _err);
+        ESP_LOGE(TAG_WiFi_Manager, "LINEA 195, Error: %d", _err);
         return _err;
     }
 
@@ -217,7 +217,7 @@ esp_err_t init_loop_default(void){
     if(loop_flag == false){
         _err = esp_event_loop_create_default();   // crea el loop para la tarea
         if(_err != ESP_OK){
-            ESP_LOGE(TAG_WiFi_Manager, "LINEA 420, Error: %d", _err);
+            ESP_LOGE(TAG_WiFi_Manager, "LINEA 220, Error: %d", _err);
             return _err;
         }
         loop_flag = true;
@@ -314,7 +314,7 @@ esp_err_t wifi_init_sta(struct WiFi_data_t _net){
     if(loop_flag == false){
         _err = init_loop_default();
         if(_err != ESP_OK){
-            ESP_LOGE(TAG_WiFi_Manager, "LINEA 559, Error: %d", _err);
+            ESP_LOGE(TAG_WiFi_Manager, "LINEA 317, Error: %d", _err);
             return _err;
         }
     }
@@ -322,21 +322,15 @@ esp_err_t wifi_init_sta(struct WiFi_data_t _net){
     if(netif_wifi_STA == NULL){
         _err = tcpip_init_STA();
         if(_err != ESP_OK){
-            ESP_LOGE(TAG_WiFi_Manager, "LINEA 551, Error: %d", _err);
+            ESP_LOGE(TAG_WiFi_Manager, "LINEA 325, Error: %d", _err);
             return _err;
         }
     }
-    
-    // _err = esp_event_loop_create_default();   // crea el loop para la tarea
-    // if(_err != ESP_OK){
-    //     ESP_LOGE(TAG_WiFi_Manager, "LINEA 420, Error: %d", _err);
-    //     return _err;
-    // }
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();    // inicializa las configuraciones WiFi por defecto
     _err = (esp_wifi_init(&cfg));
     if(_err != ESP_OK){
-        ESP_LOGE(TAG_WiFi_Manager, "LINEA 430, Error: %d", _err);
+        ESP_LOGE(TAG_WiFi_Manager, "LINEA 333, Error: %d", _err);
         return _err;
     }
 
@@ -348,7 +342,7 @@ esp_err_t wifi_init_sta(struct WiFi_data_t _net){
                                                     NULL,
                                                     &instance_any_id);
         if(_err != ESP_OK){
-            ESP_LOGE(TAG_WiFi_Manager, "LINEA 443, Error: %d", _err);
+            ESP_LOGE(TAG_WiFi_Manager, "LINEA 351, Error: %d", _err);
             return _err;
         }
     }
@@ -360,15 +354,10 @@ esp_err_t wifi_init_sta(struct WiFi_data_t _net){
                                                     NULL,
                                                     &instance_got_ip);
         if(_err != ESP_OK){
-            ESP_LOGE(TAG_WiFi_Manager, "LINEA 453, Error: %d", _err);
+            ESP_LOGE(TAG_WiFi_Manager, "LINEA 363, Error: %d", _err);
             return _err;
         }
     }
-
-      // STA
-    // if(netif_wifi_STA == NULL){
-    //     netif_wifi_STA = esp_netif_create_default_wifi_sta();                // crea una station
-    // }
     
     
     wifi_config_t wifi_config_sta = {
@@ -411,20 +400,20 @@ esp_err_t wifi_init_sta(struct WiFi_data_t _net){
 
     _err = esp_wifi_set_mode(WIFI_MODE_STA);
     if(_err != ESP_OK){
-        ESP_LOGE(TAG_WiFi_Manager, "LINEA 473, Error: %d", _err);
+        ESP_LOGE(TAG_WiFi_Manager, "LINEA 403, Error: %d", _err);
         return _err;
     }
 
 
     _err = (esp_wifi_set_config(WIFI_IF_STA, &wifi_config_sta) );
     if(_err != ESP_OK){
-        ESP_LOGE(TAG_WiFi_Manager, "LINEA 479, Error: %d", _err);
+        ESP_LOGE(TAG_WiFi_Manager, "LINEA 410, Error: %d", _err);
         return _err;
     }
 
     _err = (esp_wifi_start() );
     if(_err != ESP_OK){
-        ESP_LOGE(TAG_WiFi_Manager, "LINEA 485, Error: %d", _err);
+        ESP_LOGE(TAG_WiFi_Manager, "LINEA 416, Error: %d", _err);
         return _err;
     }
 
@@ -450,7 +439,6 @@ void wifi_deinit_sta(void){
 }
 
 esp_err_t wifi_init_apsta(struct WiFi_data_t _net){
-    // esp_wifi_stop();
     esp_err_t _err = ESP_OK;
 
     if(loop_flag == false){
@@ -460,7 +448,7 @@ esp_err_t wifi_init_apsta(struct WiFi_data_t _net){
     if(netif_wifi_AP == NULL){
         _err = (tcpip_init_AP());
         if(_err != ESP_OK){
-            ESP_LOGE(TAG_WiFi_Manager, "LINEA 699, Error: %d", _err);
+            ESP_LOGE(TAG_WiFi_Manager, "LINEA 451, Error: %d", _err);
             return _err;
         }
     }
@@ -468,15 +456,10 @@ esp_err_t wifi_init_apsta(struct WiFi_data_t _net){
      if(netif_wifi_STA == NULL){
         _err = tcpip_init_STA();
         if(_err != ESP_OK){
-            ESP_LOGE(TAG_WiFi_Manager, "LINEA 704, Error: %d", _err);
+            ESP_LOGE(TAG_WiFi_Manager, "LINEA 459, Error: %d", _err);
             return _err;
         }
     }
-    
-    // ESP_ERROR_CHECK(esp_netif_init());                  // inicia TCP/IP
-
-    // ESP_ERROR_CHECK(esp_event_loop_create_default());   // crea un event loop
-    // netif_wifi_AP = esp_netif_create_default_wifi_ap();                 // inicia la netif para el AP
 
     
     if(instance_any_id == NULL){
@@ -486,7 +469,7 @@ esp_err_t wifi_init_apsta(struct WiFi_data_t _net){
                                                     NULL,
                                                     &instance_any_id);
         if(_err != ESP_OK){
-            ESP_LOGE(TAG_WiFi_Manager, "LINEA 443, Error: %d", _err);
+            ESP_LOGE(TAG_WiFi_Manager, "LINEA 472, Error: %d", _err);
             return _err;
         }
     }
@@ -498,16 +481,11 @@ esp_err_t wifi_init_apsta(struct WiFi_data_t _net){
                                                     NULL,
                                                     &instance_got_ip);
         if(_err != ESP_OK){
-            ESP_LOGE(TAG_WiFi_Manager, "LINEA 453, Error: %d", _err);
+            ESP_LOGE(TAG_WiFi_Manager, "LINEA 484, Error: %d", _err);
             return _err;
         }
     }
 
-    // // STA
-    // if(netif_wifi_STA == NULL){
-    //     netif_wifi_STA = esp_netif_create_default_wifi_sta();                // crea una station
-    // }
-    
     
     wifi_config_t wifi_config_sta = {
         .sta = {
@@ -523,29 +501,12 @@ esp_err_t wifi_init_apsta(struct WiFi_data_t _net){
         },
     };
 
-    // wifi_config_t wifi_config_ap = {                       // configuraciones del AP
-    //     .ap = {
-    //         .ssid = WIFI_SSID,
-    //         .ssid_len = strlen(WIFI_SSID),
-    //         .channel = WIFI_CHANNEL,
-    //         .password = WIFI_PASS,
-    //         .max_connection = MAX_STA_CONN,
-    //         .authmode = WIFI_AUTH_WPA_WPA2_PSK,
-    //         .pmf_cfg = {
-    //                 .required = false,
-    //         },
-    //     },
-    // };
-
     uint8_t *aux1;
 
     aux1 = (uint8_t*)_net.SSID;    
     for(int i = 0; i<strlen(_net.SSID); i++){
         wifi_config_sta.sta.ssid[i] = *aux1;
         aux1++;
-        // if(i == strlen(_net.SSID)){
-        //     wifi_config.sta.ssid[i] = (uint8_t)("\0");
-        // }
     }
     ESP_LOGW(TAG_WiFi_Manager, "SSID -> %s", wifi_config_sta.sta.ssid);
 
@@ -553,46 +514,26 @@ esp_err_t wifi_init_apsta(struct WiFi_data_t _net){
     for(int i = 0; i<strlen(_net.pass); i++){
         wifi_config_sta.sta.password[i] = *aux1;
         aux1++;
-        // if(i == strlen(_net.pass)){
-        //     wifi_config.sta.password[i] = (uint8_t)("\0");
-        // }
     }
     ESP_LOGW(TAG_WiFi_Manager, "pass -> %s", wifi_config_sta.sta.password);
-
-    // strcpy(wifi_config.sta.ssid, _ssid);
-    // strcpy(wifi_config.sta.password, _password);
-    
-    
-    // aux1 = (char*)(&(wifi_config.sta.ssid));
-    // strcpy(aux1, _net.SSID);
-    // ESP_LOGW(TAG_WiFi_Manager, "SSID -> %s", aux1);
-    // aux1 = (char*)(&(wifi_config.sta.password));
-    // strcpy(aux1, _net.pass);
-    //  ESP_LOGW(TAG_WiFi_Manager, "pass -> %s", aux1);
 
     
 
     _err = esp_wifi_set_mode(WIFI_MODE_APSTA);
     if(_err != ESP_OK){
-        ESP_LOGE(TAG_WiFi_Manager, "LINEA 473, Error: %d", _err);
+        ESP_LOGE(TAG_WiFi_Manager, "LINEA 524, Error: %d", _err);
         return _err;
     }
 
-    // _err = esp_wifi_set_config(WIFI_IF_AP, &wifi_config_ap);
-    // if(_err != ESP_OK){
-    //     ESP_LOGE(TAG_WiFi_Manager, "LINEA 591, Error: %d", _err);
-    //     return _err;
-    // }
-
     _err = (esp_wifi_set_config(WIFI_IF_STA, &wifi_config_sta) );
     if(_err != ESP_OK){
-        ESP_LOGE(TAG_WiFi_Manager, "LINEA 479, Error: %d", _err);
+        ESP_LOGE(TAG_WiFi_Manager, "LINEA 530, Error: %d", _err);
         return _err;
     }
 
     _err = (esp_wifi_start() );
     if(_err != ESP_OK){
-        ESP_LOGE(TAG_WiFi_Manager, "LINEA 485, Error: %d", _err);
+        ESP_LOGE(TAG_WiFi_Manager, "LINEA 536, Error: %d", _err);
         return _err;
     }
 
@@ -639,12 +580,6 @@ void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id
         case WIFI_EVENT_STA_DISCONNECTED:
             ESP_LOGI(TAG_WiFi_Manager, "WiFi STA disconnected");
             wifi_connection_status.value = 0;   // bajo mi bandera de que WiFi está conectado
-            // esp_wifi_connect();
-            // esp_netif_destroy_default_wifi(netif_wifi_STA);// destruyo el objeto que en teoria no uso mas
-            // esp_event_loop_delete_default();
-            // esp_netif_deinit();
-            // esp_wifi_stop();
-            // wifi_init_softap();
             break;
         
         case WIFI_EVENT_AP_START:
@@ -714,27 +649,17 @@ static esp_err_t connect_post_handler(httpd_req_t *req)
     char buf[req->content_len + 1];
     int ret, remaining = req->content_len;
 
-    ESP_LOGW(TAG_WiFi_Manager, "linea 348");// debug Cukla
-
     while (remaining > 0) {
         /* Read the data for the request */
         if ((ret = httpd_req_recv(req, buf,
                         MIN(remaining, sizeof(buf)))) <= 0) {
-            ESP_LOGW(TAG_WiFi_Manager, "linea 354");// debug Cukla
             if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
                 /* Retry receiving if timeout occurred */
-                ESP_LOGW(TAG_WiFi_Manager, "linea 357");// debug Cukla
                 continue;
             }
             return ESP_FAIL;
         }
 
-        /* Send back the same data */
-        // httpd_resp_send_chunk(req, buf, ret);
-        // remaining -= ret;
-        
-
-        // ACA ESTABA TRABAJANDO
         uint32_t requested_actions;
         requested_actions = decode_Json(&buf[0], &data_WiFi_SC, &data_MQTT_SC);
         /*
@@ -783,9 +708,6 @@ static esp_err_t connect_post_handler(httpd_req_t *req)
                     // Close
                     nvs_close(handle_NVS);
                 }
-                // wifi_deinit_softap();
-                // aca tengo que trabajar
-                // wifi_deinit_softap();
                 esp_wifi_stop();
                 wifi_init_apsta(data_WiFi_SC);                
             }
@@ -802,7 +724,7 @@ static esp_err_t connect_post_handler(httpd_req_t *req)
                 aux = (char*)aux2;
 
                 char response[128];
-                if(mqtt_connected){
+                if(mqtt_connected){ // VER SI PONER sizeof(response) en lugar del 128
                     snprintf(response, 128, "{\"WiFi SSID\":\"%s\",\"MQTT user\":\"%s\"}", aux, data_MQTT_SC.User);
                 }else{
                     snprintf(response, 128, "{\"WiFi SSID\":\"%s\",\"MQTT user\":\"%s\"}", aux, "none");
@@ -883,14 +805,9 @@ static esp_err_t connect_post_handler(httpd_req_t *req)
                             saveConfig();
                             esp_restart();
                         }
-
-                        // Close
-                        // nvs_close(handle_NVS);
-                    }   // me quede haciendo el tema de guardar la ssid
+                    }
 
                     nvs_close(handle_NVS);
-
-                    // wifi_init_sta(data_WiFi_SC);
                 }
 
             }
@@ -899,7 +816,6 @@ static esp_err_t connect_post_handler(httpd_req_t *req)
             if(requested_actions&1){    // bit 4
                 ESP_LOGW(TAG_WiFi_Manager, "bit 4: Se envía \n");// debug Cukla
                 char *aux_s;
-                // aux_s = &mac_address_or_chipid[0];
                 esp_err_t _err;
                 _err = esp_efuse_mac_get_default(&mac_address_or_chipid[0]);
                 if(_err != ESP_OK){
@@ -1020,10 +936,8 @@ static esp_err_t WiFi_PullNets(httpd_req_t *req)
     /* Get header value string length and allocate memory for length + 1,
      * extra byte for null termination */
     buf_len = httpd_req_get_hdr_value_len(req, "Host") + 1;
-    ESP_LOGW(TAG_WiFi_Manager, "linea 793");// debug Cukla
     if (buf_len > 1) {
         buf = malloc(buf_len);
-        ESP_LOGW(TAG_WiFi_Manager, "linea 796");// debug Cukla
         /* Copy null terminated value string into buffer */
         if (httpd_req_get_hdr_value_str(req, "Host", buf, buf_len) == ESP_OK) {
             ESP_LOGI(TAG_WiFi_Manager, "Found header => Host: %s", buf);
@@ -1066,14 +980,7 @@ static esp_err_t WiFi_PullNets(httpd_req_t *req)
     httpd_resp_set_type(req, http_content_type_json);
     ESP_LOGW(TAG_WiFi_Manager, "Envio de Json ->[APP] Free memory: %lu bytes", esp_get_free_heap_size());
 	httpd_resp_send(req, resp_str, (int)strlen(resp_str));
-    ESP_LOGW(TAG_WiFi_Manager, "longitud del testito -> %d\n", (int)strlen(resp_str));
-    // httpd_resp_send_chunk(req, resp_str, (int)strlen(resp_str)+1);
-    // httpd_resp_sendstr(req, resp_str);
-    // if (resp_str != NULL){
-    //     httpd_resp_send(req, resp_str, (int)strlen(resp_str));
-    //     free(resp_str);
-    // }
-
+    ESP_LOGW(TAG_WiFi_Manager, "longitud del JSON de redes -> %d\n", (int)strlen(resp_str));
     /* After sending the HTTP response the old HTTP request
      * headers are lost. Check if HTTP request headers can be read now. */
     if (httpd_req_get_hdr_value_len(req, "Host") == 0) {
@@ -1132,7 +1039,6 @@ static httpd_handle_t start_webserver(void)
 static esp_err_t stop_webserver(httpd_handle_t server)  // para detener el servidor
 {
     // Stop the httpd server
-    ESP_LOGW(TAG_WiFi_Manager, "linea 493");// debug Cukla
     // httpd_unregister_uri_handler()
     return httpd_stop(server);
 }
@@ -1150,7 +1056,6 @@ static void connect_handler(void* arg, esp_event_base_t event_base, int32_t even
 static void disconnect_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
     httpd_handle_t* server = (httpd_handle_t*) arg;
-    ESP_LOGW(TAG_WiFi_Manager, "linea 502");// debug Cukla
     if (*server) {
         ESP_LOGI(TAG_WiFi_Manager, "Stopping webserver");
         if (stop_webserver(*server) == ESP_OK) {

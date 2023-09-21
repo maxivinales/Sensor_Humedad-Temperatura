@@ -63,10 +63,12 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         ESP_LOGI(TAG_MQTT, "MQTT_EVENT_DATA");
         printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
         printf("DATA=%.*s\r\n", event->data_len, event->data);
-        if(strcmp(event->topic, topic_control) == 0){
+        if(strcmp(event->topic, topic_control) == 0 || strcmp(event->topic, topic_control) == 123){
             struct data_control_t cmd_received;
             cmd_received = JsonDecodeMQTTControl(event->data);
             xQueueSend(msg_queue_toControl, &cmd_received, portMAX_DELAY);
+        }else{
+            ESP_LOGW(TAG_MQTT, "strcmp(event->topic, topic_control) = %d", strcmp(event->topic, topic_control));
         }
         break;
     case MQTT_EVENT_ERROR:

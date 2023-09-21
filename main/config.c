@@ -152,3 +152,50 @@ esp_err_t get_chipid(){
     }
     return(_err);
 }
+
+char* mergeJsons(char* json1, char* json2) {
+    cJSON *root1 = cJSON_Parse(json1);
+    cJSON *root2 = cJSON_Parse(json2);
+
+    if (root1 == NULL || root2 == NULL) {
+        printf("Error parsing JSON (mergeJsons)\n");
+        return NULL;
+    }
+
+    cJSON *root3 = cJSON_CreateObject();
+
+    cJSON *item = NULL;
+    cJSON_ArrayForEach(item, root1) {
+        cJSON_AddItemToObject(root3, item->string, cJSON_Duplicate(item, 1));
+    }
+
+    cJSON_ArrayForEach(item, root2) {
+        cJSON_AddItemToObject(root3, item->string, cJSON_Duplicate(item, 1));
+    }
+    char *string = cJSON_PrintUnformatted(root3);
+    cJSON_Delete(root1);
+    cJSON_Delete(root2);
+    cJSON_Delete(root3);
+
+    return string;
+}
+
+char* embedJsonInObject(char* json, const char* objectName) {
+    cJSON *root = cJSON_Parse(json);
+
+    if (root == NULL) {
+        printf("Error parsing JSON (embedJsonInObject)\n");
+        return NULL;
+    }
+
+    cJSON *root2 = cJSON_CreateObject();
+    cJSON_AddItemToObject(root2, objectName, cJSON_Duplicate(root, 1));
+    char *string = cJSON_PrintUnformatted(root2);
+
+    printf("String -> \n\n%s\n\n", string);
+    
+    cJSON_Delete(root);
+    cJSON_Delete(root2);
+
+    return string;
+}

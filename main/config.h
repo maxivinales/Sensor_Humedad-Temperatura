@@ -169,6 +169,9 @@ esp_err_t saveConfig();
 
 esp_err_t get_chipid();
 
+char* mergeJsons(char* json1, char* json2);
+char* embedJsonInObject(char* json, const char* objectName);
+
 // Variables
 struct WiFi_data_t data_WiFi_SC;
 struct MQTT_user_data_t data_MQTT_SC;

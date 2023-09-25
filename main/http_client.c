@@ -114,6 +114,23 @@ esp_err_t client_event_get_handler(esp_http_client_event_handle_t evt)
             // ESP_LOGW("debug Cukla http_client", "linea 90");
             cJSON *datetime = cJSON_GetObjectItemCaseSensitive(Jsonsito, "datetime");
             if (datetime != NULL) {
+                char fecha_k[11]; // 10 caracteres para la fecha y 1 para el terminador nulo '\0'
+                char hora_k[14];   // 8 caracteres para la hora y 1 para el terminador nulo '\0'
+                printf("datetime: %s\n", datetime->valuestring);
+                strcpy(fecha_y_hora.value_str, datetime->valuestring);
+                // TRABAJAR DESDE ACA
+
+                // Copias los primeros 10 caracteres de fecha_y_hora.value_str a fecha_k
+                strncpy(fecha_k, fecha_y_hora.value_str, 10);
+                fecha_k[10] = '\0'; // Añadis el terminador nulo para indicar el fin de la cadena
+                // Copias los caracteres del 11 al 18 de fecha_y_hora.value_str a hora_k
+                strncpy(hora_k, &fecha_y_hora.value_str[11], 13);
+                hora_k[13] = '\0'; // Añadis el terminador nulo para indicar el fin de la cadena
+                // Imprimes las cadenas resultantes
+                printf("fecha_k: %s\n", fecha_k);
+                printf("hora_k: %s\n", hora_k);
+
+
                 printf("datetime: %s\n", datetime->valuestring);
                 strcpy(fecha_y_hora.value_str, datetime->valuestring);
                 // cJSON_Delete(datetime);
@@ -121,11 +138,7 @@ esp_err_t client_event_get_handler(esp_http_client_event_handle_t evt)
             } else {
                 ESP_LOGW(TAG_http_client, "Objeto datetime no encontrado o no válido\n");
             }
-            // ESP_LOGW("debug Cukla http_client", "linea 121");
 
-            // free(recv_http); // Liberar recv_http después de analizar el JSON
-            // recv_http = NULL; // Establecer el puntero a NULL para evitar errores futuros
-            // free(Jsonsito);
             if(Jsonsito != NULL){
                 cJSON_Delete(Jsonsito);
                 Jsonsito = NULL;

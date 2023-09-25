@@ -121,17 +121,19 @@ void control_task(void *parameter){
                     ESP_LOGI(TAG_CONTROL, "Testeo -> %d\n%f\n%s", msj_control->value, msj_control->value_f, msj_control->value_str);
                     ESP_LOGW(TAG_CONTROL, "Free memory: %lu bytes", esp_get_free_heap_size());
 
-                    char json1[] = "{\"datetime\":{\"date\":\"21-09-2023\",\"time\":\"08:20:55:2353\"}}";
-                    char json2[] = "{\"Temperatura\":{\"Mod\":36,\"ud\":\"°C\"},\"HR\":{\"Mod\":95,\"ud\":\"%\"}}";//"{\"data\":{\"Temperatura\":{\"Mod\":36,\"ud\":\"°C\"},\"HR\":{\"Mod\":95,\"ud\":\"%%\"}}}";
-                    char *json3, *json4;
-                    json3 = embedJsonInObject(&json2, "data");
-                    json4 = mergeJsons(&json1, json3);
-                    ESP_LOGI(TAG_CONTROL, "json1:\n\n%s\n\n", json1);
-                    ESP_LOGI(TAG_CONTROL, "json2:\n\n%s\n\n", json2);
-                    ESP_LOGI(TAG_CONTROL, "json3:\n\n%s\n\n", json3);
-                    ESP_LOGI(TAG_CONTROL, "json4:\n\n%s\n\n", json4);
-                    free(json3);
-                    free(json4);
+                    // char json1[] = "{\"datetime\":{\"date\":\"21-09-2023\",\"time\":\"08:20:55:2353\"}}";
+                    // char json2[] = "{\"Temperatura\":{\"Mod\":36,\"ud\":\"°C\"},\"HR\":{\"Mod\":95,\"ud\":\"%\"}}";//"{\"data\":{\"Temperatura\":{\"Mod\":36,\"ud\":\"°C\"},\"HR\":{\"Mod\":95,\"ud\":\"%%\"}}}";
+                    // char *json3, *json4;
+                    // json3 = embedJsonInObject(&json2, "data");
+                    // json4 = mergeJsons(&json1, json3);
+                    // ESP_LOGI(TAG_CONTROL, "json1:\n\n%s\n\n", json1);
+                    // ESP_LOGI(TAG_CONTROL, "json2:\n\n%s\n\n", json2);
+                    // ESP_LOGI(TAG_CONTROL, "json3:\n\n%s\n\n", json3);
+                    // ESP_LOGI(TAG_CONTROL, "json4:\n\n%s\n\n", json4);
+                    // free(json3);
+                    // free(json4);
+
+                    get_data_time("http://worldtimeapi.org/api/timezone/America/Argentina/Cordoba");
                 break;
 
                 case WIFI_MANAGER_START:

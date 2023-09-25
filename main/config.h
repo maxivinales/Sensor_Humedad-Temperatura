@@ -189,5 +189,7 @@ struct data_t wifi_connection_status = {.value = 0};
 struct data_t ip_status = {.value = 0};
 
 struct data_t fecha_y_hora;
+struct data_t fecha;
+struct data_t hora;
 
 #endif

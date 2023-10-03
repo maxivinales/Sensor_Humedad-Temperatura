@@ -76,6 +76,8 @@
 
 // pines
 #define LED_ESP 2
+#define SDA 21
+#define SCL 22
 
 // uC
 #define APP_CORE 1

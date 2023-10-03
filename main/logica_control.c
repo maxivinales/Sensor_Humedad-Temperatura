@@ -8,10 +8,15 @@
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "freertos/projdefs.h"
+#include "i2cdev.h"
 #include "ota.c"
 #include "http_client.c"
 #include "mqtt.c"
 #include <stdio.h>
+#include <time.h>
+#include "i2cdev.h"
+#include "ds3231.h"
+
 
 // #include "config.h"
 // #include "Leq_task.c"
@@ -20,6 +25,8 @@
 // #include "ota.c"
 
 static const char *TAG_CONTROL = "Logica de control";
+
+extern SemaphoreHandle_t mutex_i2c;
 
 TaskHandle_t TaskHandle_control;
 QueueHandle_t msg_queue_toControl = NULL;
@@ -92,6 +99,13 @@ void control_task(void *parameter){
         
     }
 
+    // configuración RTC
+    xSemaphoreTake(mutex_i2c, portMAX_DELAY);
+    i2c_dev_t rtc_ds3231;
+    ESP_ERROR_CHECK(ds3231_init_desc(&rtc_ds3231, I2C_NUM_0, SDA, SCL));
+
+    xSemaphoreGive(mutex_i2c);
+
     aux_launch();   // lanzo mi tarea auxiliar, TENGO QUE CAMBIARLE EL NOMBRE
 
     TickType_t xPeriod = portMAX_DELAY;//pdMS_TO_TICKS(30000);
@@ -133,9 +147,16 @@ void control_task(void *parameter){
                     // free(json3);
                     // free(json4);
 
-                    get_data_time("http://worldtimeapi.org/api/timezone/America/Argentina/Cordoba");
-                break;
+                    // get_data_time("http://worldtimeapi.org/api/timezone/America/Argentina/Cordoba");
 
+                    struct tm _time;
+                    xSemaphoreTake(mutex_i2c, portMAX_DELAY);
+                    ds3231_get_time(&rtc_ds3231, &_time);
+                    ESP_LOGI(TAG_CONTROL, "%d:%d:%d", _time.tm_hour, _time.tm_min, _time.tm_sec);
+                    xSemaphoreGive(mutex_i2c);
+
+                break;
+                
                 case WIFI_MANAGER_START:
                     // code
                     ESP_LOGI(TAG_CONTROL, "Arranca el WiFi Manager");

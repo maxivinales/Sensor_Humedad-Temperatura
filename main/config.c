@@ -199,3 +199,30 @@ char* embedJsonInObject(char* json, const char* objectName) {
 
     return string;
 }
+
+esp_err_t init_sntp(){
+    esp_err_t ret = ESP_OK;// = esp_sntp_init();
+    esp_sntp_setoperatingmode(0);
+    esp_sntp_setservername(0, CONFIG_SNTP_SERVER1);
+    esp_sntp_setservername(1, CONFIG_SNTP_SERVER2);
+    sntp_init();
+    if (ret == ESP_OK) {
+        ESP_LOGI("config sntp", "SNTP inicializado con éxito");
+    } else {
+        ESP_LOGE("config sntp", "Error al inicializar SNTP");
+    }
+    return(ret);
+}
+
+struct tm get_time_now(){
+    time_t current_time;
+    struct tm timeinfo;
+    time(&current_time);
+    // localtime_r(&current_time, &timeinfo);
+    // ESP_LOGI(TAG_CONFIG, "Time_UNIX -> %llu", current_time);
+    // gmtime_s(&timeinfo, &current_time);
+    gmtime_r(&current_time, &timeinfo); // no entiendo porque no usa gmtime_s
+    timeinfo.tm_year += 1900;
+    ESP_LOGI(TAG_CONFIG, "Time -> %d/%d/%d %d:%d:%d", timeinfo.tm_mday, timeinfo.tm_mon, timeinfo.tm_year, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+    return(timeinfo);
+}

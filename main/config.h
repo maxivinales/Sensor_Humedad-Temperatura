@@ -50,6 +50,7 @@
 // #include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <time.h>
 // #include <string.h>
 // #include "esp_wifi.h"
 // #include "esp_system.h"
@@ -66,6 +67,8 @@
 #include "lwip/netdb.h"
 // #include "esp_log.h"
 #include "mqtt_client.h"
+
+#include "esp_sntp.h"
 
 //// para JSON
 
@@ -95,6 +98,12 @@
 #define FIRMWARE_VERSION_DEFAULT "0.0.0"
 #define OTA_URL_FANIOT  "http://fabrica.faniot.ar:1880"
 #define MQTT_URL_FANIOT "mqtt://192.168.1.66:1883"
+
+// Configuración SNTP
+#define CONFIG_SNTP_SERVER1 "pool.ntp.org"
+#define CONFIG_SNTP_SERVER2 "time.google.com"
+#define CONFIG_SNTP_TIMEZONE "ART-3"        // esto hay que cambiar después
+#define CONFIG_SNTP_UPDATE_DELAY 3600000 // Intervalo de actualización en milisegundos (1 hora)
 
 //// Cuestiones referidas al WiFi
 struct WiFi_data_t{
@@ -171,6 +180,9 @@ esp_err_t saveConfig();
 
 esp_err_t get_chipid();
 
+esp_err_t init_sntp();
+struct tm get_time_now();
+
 char* mergeJsons(char* json1, char* json2);
 char* embedJsonInObject(char* json, const char* objectName);
 
@@ -190,8 +202,10 @@ struct data_t new_firmware_version = {.value_str = FIRMWARE_VERSION_DEFAULT};
 struct data_t wifi_connection_status = {.value = 0};
 struct data_t ip_status = {.value = 0};
 
+struct tm datetime_SC;
 struct data_t fecha_y_hora;
 struct data_t fecha;
 struct data_t hora;
+struct data_t zona_horaria = {.value_str= CONFIG_SNTP_TIMEZONE};
 
 #endif

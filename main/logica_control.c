@@ -99,11 +99,14 @@ void control_task(void *parameter){
         
     }
 
+    // configuracion sntp
+    init_sntp();
+    
     // configuración RTC
     xSemaphoreTake(mutex_i2c, portMAX_DELAY);
     i2c_dev_t rtc_ds3231;
     ESP_ERROR_CHECK(ds3231_init_desc(&rtc_ds3231, I2C_NUM_0, SDA, SCL));
-
+    // ds3231_set_time(&rtc_ds3231, &datetime_SC);
     xSemaphoreGive(mutex_i2c);
 
     aux_launch();   // lanzo mi tarea auxiliar, TENGO QUE CAMBIARLE EL NOMBRE
@@ -155,6 +158,21 @@ void control_task(void *parameter){
                     ESP_LOGI(TAG_CONTROL, "%d:%d:%d", _time.tm_hour, _time.tm_min, _time.tm_sec);
                     xSemaphoreGive(mutex_i2c);
 
+                    // time_t current_time;
+                    // struct tm timeinfo;
+                    // time(&current_time);
+                    // // localtime_r(&current_time, &timeinfo);
+                    // ESP_LOGI(TAG_CONTROL, "Time_UNIX -> %llu", current_time);
+                    // // gmtime_s(&timeinfo, &current_time);
+                    // gmtime_r(&current_time, &timeinfo); // no entiendo porque no usa gmtime_s
+                    // timeinfo.tm_year += 1900;
+                    // ESP_LOGI(TAG_CONTROL, "Time -> %d/%d/%d %d:%d:%d", timeinfo.tm_mday, timeinfo.tm_mon, timeinfo.tm_year, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+                    // // xSemaphoreTake(mutex_i2c, portMAX_DELAY);
+                    // // ds3231_get_raw_temp(i2c_dev_t *dev, int16_t *temp)
+                    datetime_SC = get_time_now();
+                    xSemaphoreTake(mutex_i2c, portMAX_DELAY);
+                    ESP_ERROR_CHECK(ds3231_set_time(&rtc_ds3231, &datetime_SC));
+                    xSemaphoreGive(mutex_i2c);
                 break;
                 
                 case WIFI_MANAGER_START:

@@ -138,7 +138,8 @@ typedef enum    //definimos un tipo de datos categoricos, para trabajar mas como
     SAVE,
     ERROR_RECEPCION,
     TEST,
-    WIFI_MANAGER_START
+    WIFI_MANAGER_START,
+    UPDATE_TIME
 } cmd_control_t;
 
 typedef enum    //definimos un tipo de datos categoricos, para trabajar mas comodamente

@@ -222,7 +222,7 @@ struct tm get_time_now(){
     // ESP_LOGI(TAG_CONFIG, "Time_UNIX -> %llu", current_time);
     // gmtime_s(&timeinfo, &current_time);
     gmtime_r(&current_time, &timeinfo); // no entiendo porque no usa gmtime_s
-    timeinfo.tm_year += 1900;
-    ESP_LOGI(TAG_CONFIG, "Time -> %d/%d/%d %d:%d:%d", timeinfo.tm_mday, timeinfo.tm_mon, timeinfo.tm_year, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+    // timeinfo.tm_year += 1900;
+    ESP_LOGI(TAG_CONFIG, "Time -> %d/%d/%d %d:%d:%d", timeinfo.tm_mday, timeinfo.tm_mon, timeinfo.tm_year += 1900, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
     return(timeinfo);
 }

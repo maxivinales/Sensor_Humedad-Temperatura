@@ -136,43 +136,7 @@ void control_task(void *parameter){
                 case TEST:
                     // code
                     ESP_LOGI(TAG_CONTROL, "Testeo -> %d\n%f\n%s", msj_control->value, msj_control->value_f, msj_control->value_str);
-                    ESP_LOGW(TAG_CONTROL, "Free memory: %lu bytes", esp_get_free_heap_size());
-
-                    // char json1[] = "{\"datetime\":{\"date\":\"21-09-2023\",\"time\":\"08:20:55:2353\"}}";
-                    // char json2[] = "{\"Temperatura\":{\"Mod\":36,\"ud\":\"°C\"},\"HR\":{\"Mod\":95,\"ud\":\"%\"}}";//"{\"data\":{\"Temperatura\":{\"Mod\":36,\"ud\":\"°C\"},\"HR\":{\"Mod\":95,\"ud\":\"%%\"}}}";
-                    // char *json3, *json4;
-                    // json3 = embedJsonInObject(&json2, "data");
-                    // json4 = mergeJsons(&json1, json3);
-                    // ESP_LOGI(TAG_CONTROL, "json1:\n\n%s\n\n", json1);
-                    // ESP_LOGI(TAG_CONTROL, "json2:\n\n%s\n\n", json2);
-                    // ESP_LOGI(TAG_CONTROL, "json3:\n\n%s\n\n", json3);
-                    // ESP_LOGI(TAG_CONTROL, "json4:\n\n%s\n\n", json4);
-                    // free(json3);
-                    // free(json4);
-
-                    // get_data_time("http://worldtimeapi.org/api/timezone/America/Argentina/Cordoba");
-
-                    struct tm _time;
-                    xSemaphoreTake(mutex_i2c, portMAX_DELAY);
-                    ds3231_get_time(&rtc_ds3231, &_time);
-                    ESP_LOGI(TAG_CONTROL, "%d:%d:%d", _time.tm_hour, _time.tm_min, _time.tm_sec);
-                    xSemaphoreGive(mutex_i2c);
-
-                    // time_t current_time;
-                    // struct tm timeinfo;
-                    // time(&current_time);
-                    // // localtime_r(&current_time, &timeinfo);
-                    // ESP_LOGI(TAG_CONTROL, "Time_UNIX -> %llu", current_time);
-                    // // gmtime_s(&timeinfo, &current_time);
-                    // gmtime_r(&current_time, &timeinfo); // no entiendo porque no usa gmtime_s
-                    // timeinfo.tm_year += 1900;
-                    // ESP_LOGI(TAG_CONTROL, "Time -> %d/%d/%d %d:%d:%d", timeinfo.tm_mday, timeinfo.tm_mon, timeinfo.tm_year, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
-                    // // xSemaphoreTake(mutex_i2c, portMAX_DELAY);
-                    // // ds3231_get_raw_temp(i2c_dev_t *dev, int16_t *temp)
-                    datetime_SC = get_time_now();
-                    xSemaphoreTake(mutex_i2c, portMAX_DELAY);
-                    ESP_ERROR_CHECK(ds3231_set_time(&rtc_ds3231, &datetime_SC));
-                    xSemaphoreGive(mutex_i2c);
+                    ESP_LOGW(TAG_CONTROL, "Free memory: %lu bytes", esp_get_free_heap_size());  
                 break;
                 
                 case WIFI_MANAGER_START:
@@ -182,6 +146,16 @@ void control_task(void *parameter){
                     saveConfig();
                     vTaskDelay(pdMS_TO_TICKS(1000));
                     esp_restart();
+                break;
+                
+                case UPDATE_TIME:
+                    struct tm _time;
+                    datetime_SC = get_time_now();
+                    xSemaphoreTake(mutex_i2c, portMAX_DELAY);
+                    ds3231_get_time(&rtc_ds3231, &_time);
+                    ESP_LOGI(TAG_CONTROL, "hora vieja RTC -> %d/%d/%d %d:%d:%d",_time.tm_mday, _time.tm_mon + 1, _time.tm_year, _time.tm_hour, _time.tm_min, _time.tm_sec);
+                    ESP_ERROR_CHECK(ds3231_set_time(&rtc_ds3231, &datetime_SC));
+                    xSemaphoreGive(mutex_i2c);
                 break;
 
                 default:

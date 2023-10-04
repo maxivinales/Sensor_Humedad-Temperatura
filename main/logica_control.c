@@ -152,7 +152,7 @@ void control_task(void *parameter){
                     struct tm _time;
                     datetime_SC = get_time_now();
                     xSemaphoreTake(mutex_i2c, portMAX_DELAY);
-                    ds3231_get_time(&rtc_ds3231, &_time);
+                    ESP_ERROR_CHECK(ds3231_get_time(&rtc_ds3231, &_time));
                     ESP_LOGI(TAG_CONTROL, "hora vieja RTC -> %d/%d/%d %d:%d:%d",_time.tm_mday, _time.tm_mon + 1, _time.tm_year, _time.tm_hour, _time.tm_min, _time.tm_sec);
                     ESP_ERROR_CHECK(ds3231_set_time(&rtc_ds3231, &datetime_SC));
                     xSemaphoreGive(mutex_i2c);

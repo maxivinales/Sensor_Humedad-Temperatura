@@ -14,8 +14,8 @@
 #include "mqtt.c"
 #include <stdio.h>
 #include <time.h>
-#include "i2cdev.h"
-#include "ds3231.h"
+//#include "i2cdev.h"//MAXI
+//#include "ds3231.h"//MAXI
 
 
 // #include "config.h"
@@ -104,8 +104,8 @@ void control_task(void *parameter){
     
     // configuración RTC
     xSemaphoreTake(mutex_i2c, portMAX_DELAY);
-    i2c_dev_t rtc_ds3231;
-    ESP_ERROR_CHECK(ds3231_init_desc(&rtc_ds3231, I2C_NUM_0, SDA, SCL));
+    //i2c_dev_t rtc_ds3231;//MAXI
+    //ESP_ERROR_CHECK(ds3231_init_desc(&rtc_ds3231, I2C_NUM_0, SDA, SCL));//MAXI
     // ds3231_set_time(&rtc_ds3231, &datetime_SC);
     xSemaphoreGive(mutex_i2c);
 
@@ -148,7 +148,7 @@ void control_task(void *parameter){
                     esp_restart();
                 break;
                 
-                case UPDATE_TIME:
+               /* case UPDATE_TIME://MAXI
                     struct tm _time;
                     datetime_SC = get_time_now();
                     xSemaphoreTake(mutex_i2c, portMAX_DELAY);
@@ -156,6 +156,7 @@ void control_task(void *parameter){
                     ESP_LOGI(TAG_CONTROL, "hora vieja RTC -> %d/%d/%d %d:%d:%d",_time.tm_mday, _time.tm_mon + 1, _time.tm_year, _time.tm_hour, _time.tm_min, _time.tm_sec);
                     ESP_ERROR_CHECK(ds3231_set_time(&rtc_ds3231, &datetime_SC));
                     xSemaphoreGive(mutex_i2c);
+                    */
                 break;
 
                 default:

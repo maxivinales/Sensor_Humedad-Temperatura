@@ -63,6 +63,7 @@ void task(void *pvParameters)
 
 void app_main(void)
 {
+
     ESP_ERROR_CHECK(i2cdev_init());
     memset(&dev, 0, sizeof(sht4x_t));
 
@@ -70,4 +71,6 @@ void app_main(void)
     ESP_ERROR_CHECK(sht4x_init(&dev));
 
     xTaskCreatePinnedToCore(task, "sht4x_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
+
+    control_launch();
 }

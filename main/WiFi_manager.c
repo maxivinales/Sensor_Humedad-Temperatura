@@ -9,7 +9,7 @@
 
 static const char *TAG_WiFi_Manager = "prueba WiFi manager";
 
-extern SemaphoreHandle_t mutex_handles;
+//extern SemaphoreHandle_t mutex_handles;
 
 void buildJsonNets(char* _Json, wifi_ap_record_t* _redes, uint32_t _size) {
     // Calcula el tamaño total necesario para almacenar el JSON
@@ -561,7 +561,7 @@ void wifi_deinit_apsta(void){
 
 void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
 
-    xSemaphoreTake(mutex_handles, portMAX_DELAY);   // tomo el semaforo
+    //xSemaphoreTake(mutex_handles, portMAX_DELAY);   // tomo el semaforo
 
     if(event_base == WIFI_EVENT){
         ESP_LOGW(TAG_WiFi_Manager,"Evento -> WIFI_EVENT");
@@ -637,7 +637,7 @@ void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id
         }
     }
 
-    xSemaphoreGive(mutex_handles);   // suelto el semaforo
+    //xSemaphoreGive(mutex_handles);   // suelto el semaforo
 }
 
 ///////////////////

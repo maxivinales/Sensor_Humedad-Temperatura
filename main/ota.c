@@ -11,11 +11,11 @@ extern const uint8_t server_cert_pem_start[] asm("_binary_ca_cert_pem_start");
 extern const uint8_t server_cert_pem_end[] asm("_binary_ca_cert_pem_end");
 
 // recursos RTOS
-extern SemaphoreHandle_t mutex_handles;
+//extern SemaphoreHandle_t mutex_handles;
 
 static void event_handler_OTA(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
-    xSemaphoreTake(mutex_handles, portMAX_DELAY);   // tomo el semaforo
+    //xSemaphoreTake(mutex_handles, portMAX_DELAY);   // tomo el semaforo
 
     if (event_base == ESP_HTTPS_OTA_EVENT) {
         switch (event_id) {
@@ -49,7 +49,7 @@ static void event_handler_OTA(void* arg, esp_event_base_t event_base, int32_t ev
         }
     }
 
-    xSemaphoreGive(mutex_handles);   // suelto el semaforo
+    //xSemaphoreGive(mutex_handles);   // suelto el semaforo
 }
 
 

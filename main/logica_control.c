@@ -8,7 +8,7 @@
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "freertos/projdefs.h"
-#include "i2cdev.h"
+//#include "i2cdev.h"
 #include "ota.c"
 #include "http_client.c"
 #include "mqtt.c"
@@ -26,7 +26,7 @@
 
 static const char *TAG_CONTROL = "Logica de control";
 
-extern SemaphoreHandle_t mutex_i2c;
+//extern SemaphoreHandle_t mutex_i2c;
 
 TaskHandle_t TaskHandle_control;
 QueueHandle_t msg_queue_toControl = NULL;
@@ -103,11 +103,11 @@ void control_task(void *parameter){
     init_sntp();
     
     // configuración RTC
-    xSemaphoreTake(mutex_i2c, portMAX_DELAY);
+    //xSemaphoreTake(mutex_i2c, portMAX_DELAY);
     //i2c_dev_t rtc_ds3231;//MAXI
     //ESP_ERROR_CHECK(ds3231_init_desc(&rtc_ds3231, I2C_NUM_0, SDA, SCL));//MAXI
     // ds3231_set_time(&rtc_ds3231, &datetime_SC);
-    xSemaphoreGive(mutex_i2c);
+    //xSemaphoreGive(mutex_i2c);
 
     aux_launch();   // lanzo mi tarea auxiliar, TENGO QUE CAMBIARLE EL NOMBRE
 
